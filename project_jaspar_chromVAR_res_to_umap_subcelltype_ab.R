@@ -30,10 +30,10 @@ p.default.cluster.sub <-  ggplot(input.umap.res.sub,aes(UMAP1,UMAP2)) +
   scale_color_manual(values = cols.celltype) +
   theme_light()
 
-png(filename ="umap_cell_subtype_ab.png",width = 4,height = 3,res = 300,units = 'in')
+png(filename ="./figs/fig2/umap_cell_subtype_ab.png",width = 4,height = 3,res = 300,units = 'in')
 print(p.default.cluster.sub)
 dev.off()
-system("open umap_cell_subtype_ab.png")
+system("open ./figs/fig2/umap_cell_subtype_ab.png")
 
 ord <- c("alpha","beta","alpha:beta")
 motif.list<- sapply(dmotifs.list.inter,function(x) x[1])[ord]
@@ -49,11 +49,11 @@ if(T){
   p.default.cluster.motifs <- lapply(names(motif.list), function(x) 
     fun.plot.project.motif(motif = x,umap.res = input.umap.res.sub,rescale = F)+
       ggtitle(paste(motif.list[x],x,sep = "_")))
-  png(filename ="project_overall_avg_motif_selected_cell_subtype.png",width =10,height = 8,res = 300,units = 'in')
+  png(filename ="./figs/fig2/project_overall_avg_motif_selected_cell_subtype.png",width =10,height = 8,res = 300,units = 'in')
   ggarrange(plotlist=list.prepend(
     p.default.cluster.motifs,p.default.cluster.sub),ncol = 3,nrow = 3)
   dev.off()
-  system("open project_overall_avg_motif_selected_cell_subtype.png")
+  system("open ./figs/fig2/project_overall_avg_motif_selected_cell_subtype.png")
 }
 
 
@@ -69,17 +69,33 @@ if(T){
                                                                         input.chromVar.z = input.chromVar.jaspar.z.scale)+
     ggtitle(paste(motif.list[x],x,sep = "_")))
   
-  png(filename ="project_overall_avg_motif_selected_cell_subtype_scaled2.png",width = 10,height = 8,res = 300,units = 'in')
+  png(filename ="./figs/fig2/project_overall_avg_motif_selected_cell_subtype_scaled2.png",width = 10,height = 8,res = 300,units = 'in')
   ggarrange(plotlist=
               list.prepend(
                 p.default.cluster.motifs.2,p.default.cluster.sub)
               ,ncol = 3,nrow = 3)
   dev.off()
-  system("open project_overall_avg_motif_selected_cell_subtype_scaled2.png")
+  system("open ./figs/fig2/project_overall_avg_motif_selected_cell_subtype_scaled2.png")
   
 }
 
+for(i in 1:1){ #length(select.gene)
+  fn=paste0("./figs/fig2/",select.gene[i],'_nolab.png')
+  #png(filename =fn,width = 1.2*3,height = 1.2*3,res = 300,units = 'in')
+  ggsave(fn,p.default.cluster.motifs.2[[i]]+
+          theme(text = element_blank(),
+                legend.position = "none"),
+         scale = 2,
+         width = 1.2,height = 1.2,units = "in")
+  
+  #dev.off()
+  system(paste0("open ",fn))
+}
 
 
+plotLegend(cols = colorRampPalette(c(muted("blue"),"white",muted("red")))(50),
+           bks = seq(-5,5,length.out = 51),fnames = sub(".png","_scale.eps",fn)
+          )
+system(paste0("open ",sub(".png","_scale.eps",fn)))
 
 

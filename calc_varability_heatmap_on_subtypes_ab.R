@@ -131,13 +131,25 @@ if(T){
 
 
 if(T){
-  png(filename = "overall_avg_motif_cell_subtype.png",height = 7.5,width = 3,units = 'in',res = 300)
+  png(filename = "./figs/overall_avg_motif_cell_subtype.png",height = 7.5,width = 3,units = 'in',res = 300)
   pheatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],scale = "none",
            cluster_cols = F,
            show_rownames = T,fontsize_row = 5,border_color = NA,
            color = cols.hm.avg.tf(30))
   dev.off()
-  system("open overall_avg_motif_cell_subtype.png")
+  system("open ./figs/overall_avg_motif_cell_subtype.png")
 }
 
 
+# correlations ------------------------------------------------------------
+pd.corr<- cor(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
+              method = "spearman"
+              )
+
+pd.corr<- cor(output.chromvar.jaspar.z.avg_by_subct)
+
+Heatmap(pd.corr, name = "foo",
+        cluster_rows = F,cluster_columns = F,
+        cell_fun = function(j, i, x, y, width, height, fill) {
+  grid.text(sprintf("%.1f", pd.corr[i, j]), x, y, gp = gpar(fontsize = 10))
+})
