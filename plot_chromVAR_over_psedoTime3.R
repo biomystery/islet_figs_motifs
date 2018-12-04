@@ -21,7 +21,7 @@ input.umap.res <- fread('./dat/Islet_123.MNN_corrected.UMAP.txt',header = T)%>%
   separate(cluster,into = c("cell_type_overall","subtype"),remove=F)
 input.umap.res[is.na(input.umap.res)]<-0
 
-input.alpha.pseduotime <- fread("./dat/alpha.pseudotime.txt",skip = 1,col.names = c("barcodes","pt"))
+input.alpha.pseduotime <- fread("./dat/alpha.pseudotime2.txt",skip = 1,col.names = c("barcodes","pt"))
 input.beta.pseduotime <- fread("./dat/beta.pseudotime2.txt",skip = 1,col.names = c("barcodes","pt"))
 input.pseudotime <- rbindlist(list(input.alpha.pseduotime[,type:="alpha"],
                                    input.beta.pseduotime[,type:="beta"]))
@@ -91,10 +91,10 @@ ht.beta <- Heatmap(mat.b,split = pa.b,
 if(T){
   ord.b <- row_order(ht.beta)
   n.clusters <- sapply(c(1,2),function(x) sum(pa.b==x))
-  ord.b <- sapply(c(2,3,1),function(x){
-    tmp <- apply(mat.b[pa.b==x,],1,mean)
-    names(tmp)[order(tmp)]})
-  n.clusters <- sapply(c(2,3,1),function(x) sum(pa.b==x))
+  #ord.b <- sapply(c(2,3,1),function(x){
+  #  tmp <- apply(mat.b[pa.b==x,],1,mean)
+  #  names(tmp)[order(tmp)]})
+  #n.clusters <- sapply(c(2,3,1),function(x) sum(pa.b==x))
   
   
   if(T){

@@ -33,6 +33,7 @@ p.default.cluster.sub <-  ggplot(input.umap.res.sub,aes(UMAP1,UMAP2)) +
 png(filename ="umap_cell_subtype_ab.png",width = 4,height = 3,res = 300,units = 'in')
 print(p.default.cluster.sub)
 dev.off()
+system("open umap_cell_subtype_ab.png")
 
 ord <- c("alpha","beta","alpha:beta")
 motif.list<- sapply(dmotifs.list.inter,function(x) x[1])[ord]
