@@ -70,9 +70,95 @@ pd.anno.b <-output.motif.pt%>%
   mutate(subtype=as.factor(subtype))%>%
   as.data.frame()
 
-require(cluster)
-
 mat.b <- smoothed.motif.pt.beta.mat.scaled[c(selected.motif$beta,selected.motif$`alpha:beta`),]
+h <- pheatmap(mat.b,cluster_cols = F,show_colnames = F,cellheight = 5)
+ord.b <- (h$tree_row$order)
+names(ord.b) <- rownames(mat.b)[ord.b]
+pheatmap(mat.b,cluster_cols = F,show_colnames = F,cellheight = 5)
+
+n.clusters <- nrow(mat.b)
+
+for(p.lab in c("label","no_label")){
+  for(p.format in c("png","pdf")){
+    wd = ifelse(p.lab=="no_label",2,6)
+    ht = ifelse(p.lab=="no_label",1.5,4)
+    fn<- paste0("./figs/fig2/subfig2B_beta_hm",p.lab,".",p.format)
+    if(p.format=="png"){
+      png(filename = fn,height =ht,width = wd,units = 'in',res = 600)
+    }else{
+      pdf(file = fn,width = wd,height = ht)
+    }
+    
+    
+    colr <- adjustcolor( brewer.pal(9,"Set1")[1:2],alpha.f = 0.2)
+    par(mgp=c(1,.3,0),mar=c(0,.4,0,0)+0.1)
+    layout(mat = matrix(c(1,2,3),3,1,byrow = T),
+           heights = c(2,n.clusters))
+    
+    if(p.lab=="label")  par(mar=c(0,4,0,0)+0.1)
+    
+    plot(pd.anno.b$pt,rep(1,nrow(pd.anno.b)),
+         col=colr[pd.anno.b$subtype],xaxs="i",
+         yaxt='n',ylab="",xaxt='n',pch=20,
+         cex=ifelse(p.lab=="label",2,.5),
+         bty="n")
+    
+    par(mar=c(0,.4,0,0)+0.1)
+    if(p.lab=="label") par(mar=c(2.5,4,0,0)+0.1)
+    image(x=seq(0,pt.max.b,by = 0.05),y=1:length(ord.b),z= t(mat.b[ord.b,]),col = cols.hm.avg.tf(50),
+          xlab='', ylab=NA,yaxt="n",tcl=-0.2,xaxt="n",yaxs='i',bty="o",useRaster=F)
+    r_labs <- NA
+    t_labs <- NA
+    if(p.lab=="label"){
+      r_labs=names(ord.b)
+      title(xlab = "Pseudo-time");t_labs=seq(0,pt.max.b,by = 5)}
+  
+  axis(side = 2,at = 1:length(ord.b),tcl=-0.2,
+       labels = r_labs,
+       las=1,cex.axis=0.5,hadj = 1)
+  axis(side = 1,at = seq(0,pt.max.b,by = 5),tcl=-0.2,labels = t_labs)
+  
+  dev.off()
+  system(paste0("open ",fn))
+  }
+}
+
+pdf(file = './figs/fig2/subfig2B_beta_hm_p.pdf')
+pheatmap(mat.b[ord.b,],cluster_rows = F,cluster_cols = F,show_colnames = F)
+dev.off()
+
+### individual plots 
+if(T){
+  fn="./figs/fig2/subfig2B_beta_hm.pdf"
+  #png(filename = fn,width = 2,height = 1.5,units = "in",res = 300)
+  pdf(file = fn,width = 2,height = 1.5)
+  par(mgp=c(2,.3,0),mar=c(0,0,0,0))
+  image(x=seq(0,pt.max.b,by = 0.05),y=1:length(ord.b),z= t(mat.b[ord.b,]),col = cols.hm.avg.tf(50),
+        xlab='', yaxt="n",tcl=-0.2,ylab=NA,xaxt="n",yaxs='i',bty="o")
+  axis(side = 2,at = 1:length(ord.b),tcl=0.05,labels = NA,las=1,cex.axis=0.75,hadj = 1)
+  axis(side = 1,at = seq(0,pt.max.b,by = 5),tcl=0.05,labels = NA)
+  dev.off()
+  system(paste0("open ",fn))
+}
+
+if(T){
+  
+  fn="./figs/fig2/subfig2B_beta_hm_anno.pdf"
+  #png(filename = fn,width = 2,height = 1.5,units = "in",res = 300)
+  pdf(file = fn,width = 2*4,height = 0.5*2)
+  par(mgp=c(2,.3,0),mar=c(0,0,0,0))
+  colr <- adjustcolor( brewer.pal(9,"Set1")[1:2],alpha.f = 0.2)# 
+  #colr <-  brewer.pal(9,"Set1")[1:2]
+  plot(pd.anno.b$pt,pd.anno.b$subtype,col=colr[pd.anno.b$subtype],xaxs="i",
+       yaxt='n',ylab="",xaxt='n',pch=20,cex=.5,bty="n",ylim=c(-2,5))
+  #ylim(c(-2,5))
+  dev.off()
+  system(paste0("open ",fn))
+}
+
+# beta: pam cluster -------------------------------------------------------
+
+
 pa.b <- pam(mat.b,k=4,cluster.only = T)
 pa.b[pa.b==4] <- 1
 pa.b["NFYB"] <- 3
@@ -218,6 +304,69 @@ require(cluster)
 
 
 mat.a <- smoothed.motif.pt.alpha.mat.scaled[c(selected.motif$alpha,selected.motif$`alpha:beta`),]
+pt.max.b <- max((output.motif.pt%>%filter(type=="alpha"))$pt)
+
+
+h <- pheatmap(mat.a,cluster_cols = F,show_colnames = F)
+ord.a <- (h$tree_row$order)
+names(ord.a) <- rownames(mat.a)[ord.a]
+n.clusters <- nrow(mat.a)
+
+for(p.lab in c("label","no_label")){
+  for(p.format in c("png","pdf")){
+    wd = ifelse(p.lab=="no_label",2,6)
+    ht = ifelse(p.lab=="no_label",1.5,4)
+    fn<- paste0("./figs/fig2/subfig2B_alpha_hm",p.lab,".",p.format)
+    if(p.format=="png"){
+      png(filename = fn,height =ht,width = wd,units = 'in',res = 600)
+    }else{
+      pdf(file = fn,width = wd,height = ht)
+    }
+    
+    
+    colr <- adjustcolor( brewer.pal(9,"Set1")[1:2],alpha.f = 0.2)
+    par(mgp=c(1,.3,0),mar=c(0,.4,0,0)+0.1)
+    layout(mat = matrix(c(1,2,3),3,1,byrow = T),
+           heights = c(2,46))
+    
+    if(p.lab=="label")  par(mar=c(0,4,0,0)+0.1)
+    
+    plot(pd.anno.b$pt,rep(1,nrow(pd.anno.b)),
+         col=colr[pd.anno.b$subtype],xaxs="i",
+         yaxt='n',ylab="",xaxt='n',pch=20,
+         cex=ifelse(p.lab=="label",2,.5),
+         bty="n")
+    
+    par(mar=c(0,.4,0,0)+0.1)
+    if(p.lab=="label") par(mar=c(2.5,4,0,0)+0.1)
+    image(x=seq(0,pt.max.a,by = 0.05),y=1:length(ord.a),z= t(mat.a[ord.a,]),col = cols.hm.avg.tf(50),
+          xlab='', ylab=NA,yaxt="n",tcl=-0.2,xaxt="n",yaxs='i',bty="o",useRaster=F)
+    r_labs <- NA
+    t_labs <- NA
+    if(p.lab=="label"){
+      r_labs=names(ord.a)
+      title(xlab = "Pseudo-time");t_labs=seq(0,pt.max.b,by = 5)}
+    
+    #axis(side = 2,at = 1:length(ord.a),tcl=0,
+    #     labels = r_labs,
+     #    las=1,cex.axis=0.5,hadj = 1)
+    axis(side = 1,at = seq(0,pt.max.b,by = 5),tcl=-0.2,labels = t_labs)
+    
+    dev.off()
+    system(paste0("open ",fn))
+  }
+}
+
+pdf(file = './figs/fig2/subfig2B_beta_hm_p.pdf')
+pheatmap(mat.a[ord.a,],cluster_rows = F,cluster_cols = F,show_colnames = F)
+dev.off()
+
+
+
+
+# Alpha:pam cluster -------------------------------------------------------
+
+
 pa.a <- pam(mat.a,k=2,cluster.only = T)
 ht.alpha <- Heatmap(mat.a,split = pa.a,
                     cluster_columns = F,
