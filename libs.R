@@ -55,7 +55,8 @@ fun.plot.project.motif <- function(motif,input.chromVar.z=input.chromVar.jaspar.
   
   motif.z <- input.chromVar.z[motif.idx[1],]
   if(rescale){
-    motif.z[motif.z>5] <- 5; motif.z[motif.z< -5] <- -5
+    sc <- max(abs(quantile(motif.z,probs=c(.05,.95))))
+    motif.z[motif.z>sc] <- sc; motif.z[motif.z< -sc] <- -sc
   }
   
   motif.z <- motif.z%>%

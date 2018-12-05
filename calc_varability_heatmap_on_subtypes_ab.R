@@ -85,13 +85,13 @@ if(T){
                      name = "ht.nolab",show_heatmap_legend = F,show_row_dend = F,combined_name_fun = NULL
   )
   #pdf("hmp.subcelltype.nolab.pdf",height = 4,width = 1.78)
-  png(filename = "hmp.subcelltype.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
+  png(filename = "./figs/fig2/hmp.subcelltype.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
   print(ht.nolab)
   decorate_heatmap_body("ht.nolab", {
     grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
   })
   dev.off()
-  system("open hmp.subcelltype.nolab.png")
+  system("open ./figs/fig2/hmp.subcelltype.nolab.png")
 }
 
 if(T){
@@ -103,20 +103,22 @@ if(T){
   )
   
   
-  pdf("hmp.subcelltype.nosplit.pdf",height = 10,width = 3)
+  pdf("./figs/fig2/hmp.subcelltype.nosplit.pdf",height = 10,width = 3)
   print(ht.nosplit)
   decorate_heatmap_body("ht.nosplit", {
     grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
   })
   dev.off()
-  system("open hmp.subcelltype.nosplit.pdf")
+  system("open ./figs/fig2/hmp.subcelltype.nosplit.pdf")
 }
 
 if(T){
   
   ht.nosplit.nolab <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
-                             col=cols.hm.avg.tf(30),cluster_columns = F,show_column_names = F,show_row_names = F,
-                             name = "ht.nosplit.nolab",show_heatmap_legend = F,show_row_dend = F,combined_name_fun = NULL)
+                             col=cols.hm.avg.tf(30),cluster_columns = F,
+                             show_column_names = F,show_row_names = F,
+                             name = "ht.nosplit.nolab",show_heatmap_legend = F,
+                             show_row_dend = F,combined_name_fun = NULL)
  
   #pdf("hmp.subcelltype.nosplit.nolab.pdf",height = 4,width = 1.78)
   png(filename = "hmp.subcelltype.nosplit.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
@@ -153,3 +155,34 @@ Heatmap(pd.corr, name = "foo",
         cell_fun = function(j, i, x, y, width, height, fill) {
   grid.text(sprintf("%.1f", pd.corr[i, j]), x, y, gp = gpar(fontsize = 10))
 })
+
+
+
+# plot violin -------------------------------------------------------------
+celltypes <- c("alpha","beta")
+output.jaspar.z<- input.chromVar.jaspar.z.agg%>%
+  filter(cell_type_overall%in% celltypes)%>%
+  filter(subtype!="3")%>%
+  select(one_of(c("rn","zval","cluster","cell_type_overall","subtype")))%>%
+  separate(rn,into = c("Jaspar.id","Motif.name"),sep = "_")
+  
+  
+for(m in c("RFX3","FOSL1")){
+  p<-ggviolin(output.jaspar.z%>%
+                filter(Motif.name==m),
+              x = "subtype",y = "zval",add = "boxplot",fill="cluster"
+  )
+  
+  p<- p + facet_wrap(~ cell_type_overall)+
+    scale_fill_manual(values = cols.celltype)+
+    theme_light()+
+    coord_cartesian(expand = T)
+  fn<- paste0("figs/fig2/",m,"_violion.pdf")
+  ggsave(p,filename = fn,width = 1.5,height = 1,scale = 5)
+  system(paste0("open ",fn))
+  fn <-  paste0("figs/fig2/",m,"_violion_nolab.pdf")
+  ggsave(p+theme(text = element_blank(),legend.position = "none"),
+         filename = fn,width = 1.5,height = 1,scale = 5)
+  system(paste0("open ",fn))
+  
+}

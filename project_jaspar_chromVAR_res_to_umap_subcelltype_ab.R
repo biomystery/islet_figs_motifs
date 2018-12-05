@@ -37,7 +37,7 @@ system("open ./figs/fig2/umap_cell_subtype_ab.png")
 
 ord <- c("alpha","beta","alpha:beta")
 motif.list<- sapply(dmotifs.list.inter,function(x) x[1])[ord]
-select.gene <- c("FOS::JUN","STAT3","NKX6-1","TEAD1","TEAD2","TEAD3")
+select.gene <- c("FOSL1","RFX3","FOS::JUN","STAT3","NKX6-1","TEAD1","TEAD2","TEAD3")
 motif.list <- unlist(sapply(select.gene, function(g){
   
   names(dmotifs.list.inter)[grep(g,dmotifs.list.inter)]
@@ -47,13 +47,20 @@ motif.list <- unlist(sapply(select.gene, function(g){
 
 if(T){
   p.default.cluster.motifs <- lapply(names(motif.list), function(x) 
-    fun.plot.project.motif(motif = x,umap.res = input.umap.res.sub,rescale = F)+
+    fun.plot.project.motif(motif = x,umap.res = input.umap.res.sub,rescale = T)+
       ggtitle(paste(motif.list[x],x,sep = "_")))
   png(filename ="./figs/fig2/project_overall_avg_motif_selected_cell_subtype.png",width =10,height = 8,res = 300,units = 'in')
   ggarrange(plotlist=list.prepend(
     p.default.cluster.motifs,p.default.cluster.sub),ncol = 3,nrow = 3)
   dev.off()
   system("open ./figs/fig2/project_overall_avg_motif_selected_cell_subtype.png")
+  
+  pdf(file ="./figs/fig2/project_overall_avg_motif_selected_cell_subtype.pdf",width =10,height = 8)
+  ggsave(filename = "./figs/fig2/project_overall_avg_motif_selected_cell_subtype.pdf",
+    ggarrange(plotlist=list.prepend(
+    p.default.cluster.motifs,p.default.cluster.sub),ncol = 3,nrow = 3),width =10,height = 8 )
+  
+  system("open ./figs/fig2/project_overall_avg_motif_selected_cell_subtype.pdf")
 }
 
 
@@ -65,6 +72,7 @@ if(T){
   
   p.default.cluster.motifs.2 <- lapply(names(motif.list), 
                                      function(x) fun.plot.project.motif(motif = x,
+                                                                        rescale = T,
                                                                         umap.res = input.umap.res.sub,
                                                                         input.chromVar.z = input.chromVar.jaspar.z.scale)+
     ggtitle(paste(motif.list[x],x,sep = "_")))
@@ -79,16 +87,18 @@ if(T){
   
 }
 
-for(i in 1:1){ #length(select.gene)
+for(i in 1:2){ #length(select.gene)
   fn=paste0("./figs/fig2/",select.gene[i],'_nolab.png')
-  #png(filename =fn,width = 1.2*3,height = 1.2*3,res = 300,units = 'in')
   ggsave(fn,p.default.cluster.motifs.2[[i]]+
           theme(text = element_blank(),
                 legend.position = "none"),
          scale = 2,
          width = 1.2,height = 1.2,units = "in")
-  
-  #dev.off()
+  system(paste0("open ",fn))
+  fn=paste0("./figs/fig2/",select.gene[i],'.pdf')
+  ggsave(fn,p.default.cluster.motifs.2[[i]],
+         scale = 2,
+         width = 1.4,height = 1.2,units = "in")
   system(paste0("open ",fn))
 }
 
