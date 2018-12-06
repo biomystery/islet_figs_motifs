@@ -58,6 +58,7 @@ splt <- unlist(sapply(names(dmotifs.list.inter), function(x){
 
 
 
+# fig2A:hm_split ----------------------------------------------------------------
 
 if(T){
   ht <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
@@ -66,17 +67,15 @@ if(T){
                row_names_gp=gpar(fontsize=5),name = "ht"
   )
   
-  
-  pdf("hmp.subcelltype.pdf",height = 10,width = 3)
+  fn <- "./figs/fig2/subfig2A_hm_split.pdf"
+  pdf(fn,height = 10,width = 3)
   print(ht)
   decorate_heatmap_body("ht", {
     grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
   })
   dev.off()
-  system("open hmp.subcelltype.pdf")
-}
+  system(paste0("open ",fn))
 
-if(T){
   ht.nolab <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
                      col=cols.hm.avg.tf(30),cluster_columns = F,show_column_names = F,show_row_names = F,
                      split = factor(splt,levels = c("alpha","beta","alpha:beta")),
@@ -84,15 +83,21 @@ if(T){
                                                  labels_gp = gpar(fontsize = 6)),
                      name = "ht.nolab",show_heatmap_legend = F,show_row_dend = F,combined_name_fun = NULL
   )
-  #pdf("hmp.subcelltype.nolab.pdf",height = 4,width = 1.78)
-  png(filename = "./figs/fig2/hmp.subcelltype.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
+  
+  fn <- "./figs/fig2/subfig2A_hm_split_nolab.pdf"
+  pdf(file = fn,height = 4,width = 1.78)
+  #png(filename = "./figs/fig2/hmp.subcelltype.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
   print(ht.nolab)
   decorate_heatmap_body("ht.nolab", {
     grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
   })
   dev.off()
-  system("open ./figs/fig2/hmp.subcelltype.nolab.png")
+  system(paste0("open ",fn))
 }
+
+
+# fig2A:hm_nosplit --------------------------------------------------------
+
 
 if(T){
   ht.nosplit <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
@@ -102,44 +107,29 @@ if(T){
                                                    labels_gp = gpar(fontsize = 5))
   )
   
-  
-  pdf("./figs/fig2/hmp.subcelltype.nosplit.pdf",height = 10,width = 3)
+  fn="./figs/fig2/subfig2A_hm.pdf"
+  pdf(fn,height = 10,width = 3)
   print(ht.nosplit)
   decorate_heatmap_body("ht.nosplit", {
     grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
   })
   dev.off()
-  system("open ./figs/fig2/hmp.subcelltype.nosplit.pdf")
-}
+  system(paste0("open ",fn))
 
-if(T){
-  
   ht.nosplit.nolab <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
                              col=cols.hm.avg.tf(30),cluster_columns = F,
                              show_column_names = F,show_row_names = F,
                              name = "ht.nosplit.nolab",show_heatmap_legend = F,
                              show_row_dend = F,combined_name_fun = NULL)
- 
-  #pdf("hmp.subcelltype.nosplit.nolab.pdf",height = 4,width = 1.78)
-  png(filename = "hmp.subcelltype.nosplit.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
+  fn="./figs/fig2/subfig2A_hm_nolab.pdf"
+  pdf(fn,height = 4,width = 1.78)
+  #png(filename = "hmp.subcelltype.nosplit.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
   print(ht.nosplit.nolab)
   decorate_heatmap_body("ht.nosplit.nolab", {
     grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
   })
   dev.off()
-  system("open hmp.subcelltype.nosplit.nolab.png")
-}
-
-
-
-if(T){
-  png(filename = "./figs/overall_avg_motif_cell_subtype.png",height = 7.5,width = 3,units = 'in',res = 300)
-  pheatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],scale = "none",
-           cluster_cols = F,
-           show_rownames = T,fontsize_row = 5,border_color = NA,
-           color = cols.hm.avg.tf(30))
-  dev.off()
-  system("open ./figs/overall_avg_motif_cell_subtype.png")
+  system(paste0("open ",fn))
 }
 
 
@@ -150,7 +140,7 @@ pd.corr<- cor(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.i
 
 pd.corr<- cor(output.chromvar.jaspar.z.avg_by_subct)
 
-Heatmap(pd.corr, name = "foo",
+Heatmap(pd.corr, name = "cor",
         cluster_rows = F,cluster_columns = F,
         cell_fun = function(j, i, x, y, width, height, fill) {
   grid.text(sprintf("%.1f", pd.corr[i, j]), x, y, gp = gpar(fontsize = 10))
@@ -158,7 +148,7 @@ Heatmap(pd.corr, name = "foo",
 
 
 
-# plot violin -------------------------------------------------------------
+# fig2A:eg violin -------------------------------------------------------------
 celltypes <- c("alpha","beta")
 output.jaspar.z<- input.chromVar.jaspar.z.agg%>%
   filter(cell_type_overall%in% celltypes)%>%
@@ -166,8 +156,8 @@ output.jaspar.z<- input.chromVar.jaspar.z.agg%>%
   select(one_of(c("rn","zval","cluster","cell_type_overall","subtype")))%>%
   separate(rn,into = c("Jaspar.id","Motif.name"),sep = "_")
   
-  
-for(m in c("RFX3","FOSL1")){
+select.gene <- c("FOSL1","FOS::JUN","RFX3","TAL1::TCF3","STAT3","NKX6-1","TEAD1","TEAD2","TEAD3")  
+for(m in select.gene){
   p<-ggviolin(output.jaspar.z%>%
                 filter(Motif.name==m),
               x = "subtype",y = "zval",add = "boxplot",fill="cluster"
@@ -177,10 +167,10 @@ for(m in c("RFX3","FOSL1")){
     scale_fill_manual(values = cols.celltype)+
     theme_light()+
     coord_cartesian(expand = T)
-  fn<- paste0("figs/fig2/",m,"_violion.pdf")
+  fn<- paste0("figs/fig2/subfig2A_",m,"_violion.pdf")
   ggsave(p,filename = fn,width = 1.5,height = 1,scale = 5)
   system(paste0("open ",fn))
-  fn <-  paste0("figs/fig2/",m,"_violion_nolab.pdf")
+  fn <-  paste0("figs/fig2/subfig2A_",m,"_violion_nolab.pdf")
   ggsave(p+theme(text = element_blank(),legend.position = "none"),
          filename = fn,width = 1.5,height = 1,scale = 5)
   system(paste0("open ",fn))

@@ -30,21 +30,24 @@ p.default.cluster.sub <-  ggplot(input.umap.res.sub,aes(UMAP1,UMAP2)) +
   scale_color_manual(values = cols.celltype) +
   theme_light()
 
-png(filename ="./figs/fig2/umap_cell_subtype_ab.png",width = 4,height = 3,res = 300,units = 'in')
-print(p.default.cluster.sub)
-dev.off()
-system("open ./figs/fig2/umap_cell_subtype_ab.png")
+
+# Plot umap ---------------------------------------------------------------
+if(F){
+  png(filename ="./figs/fig2/umap_cell_subtype_ab.png",width = 4,height = 3,res = 300,units = 'in')
+  print(p.default.cluster.sub)
+  dev.off()
+  system("open ./figs/fig2/umap_cell_subtype_ab.png")
+}
 
 ord <- c("alpha","beta","alpha:beta")
 motif.list<- sapply(dmotifs.list.inter,function(x) x[1])[ord]
-select.gene <- c("FOSL1","RFX3","FOS::JUN","STAT3","NKX6-1","TEAD1","TEAD2","TEAD3")
+select.gene <- c("FOSL1","FOS::JUN","RFX3","TAL1::TCF3","STAT3","NKX6-1","TEAD1","TEAD2","TEAD3")
 motif.list <- unlist(sapply(select.gene, function(g){
-  
   names(dmotifs.list.inter)[grep(g,dmotifs.list.inter)]
-  
 }))
 
 
+# project no scale --------------------------------------------------------
 if(T){
   p.default.cluster.motifs <- lapply(names(motif.list), function(x) 
     fun.plot.project.motif(motif = x,umap.res = input.umap.res.sub,rescale = T)+
@@ -65,13 +68,15 @@ if(T){
 
 
 # project_overall_avg_motif_all_cell_type_scaled.png
-if(T){
+# project: scale ----------------------------------------------------------
+if(F){
   input.chromVar.jaspar.z.scale <- input.chromVar.jaspar.z
   input.chromVar.jaspar.z.scale[input.chromVar.jaspar.z.scale>5] <- 5
   input.chromVar.jaspar.z.scale[input.chromVar.jaspar.z.scale< -5] <- -5
-  
+
   p.default.cluster.motifs.2 <- lapply(names(motif.list), 
-                                     function(x) fun.plot.project.motif(motif = x,
+                                     function(x) 
+                                       fun.plot.project.motif(motif = x,
                                                                         rescale = T,
                                                                         umap.res = input.umap.res.sub,
                                                                         input.chromVar.z = input.chromVar.jaspar.z.scale)+
@@ -87,25 +92,35 @@ if(T){
   
 }
 
-for(i in 1:2){ #length(select.gene)
-  fn=paste0("./figs/fig2/",select.gene[i],'_nolab.png')
-  ggsave(fn,p.default.cluster.motifs.2[[i]]+
-          theme(text = element_blank(),
-                legend.position = "none"),
-         scale = 2,
-         width = 1.2,height = 1.2,units = "in")
-  system(paste0("open ",fn))
-  fn=paste0("./figs/fig2/",select.gene[i],'.pdf')
-  ggsave(fn,p.default.cluster.motifs.2[[i]],
-         scale = 2,
-         width = 1.4,height = 1.2,units = "in")
-  system(paste0("open ",fn))
+# fig2A: egs --------------------------------------------------------------
+cols <- list(cols.sky,
+             cols.BlGy)
+for (j in 1:2){
+  for(i in 1:4){ #length(select.gene)
+    p.default.cluster.motifs.2 <- lapply(names(motif.list), 
+                                         function(x) 
+                                           fun.plot.project.motif(motif = x,
+                                                                  cls = rev(cols[[j]]),
+                                                                  rescale = T,
+                                                                  umap.res = input.umap.res.sub,
+                                                                  input.chromVar.z = input.chromVar.jaspar.z.scale)+
+                                           ggtitle(paste(motif.list[x],x,sep = "_")))
+    
+    fn=paste0("./figs/fig2/subfig2A_",select.gene[i],'_nolab_col',j,'.pdf')
+    ggsave(fn,p.default.cluster.motifs.2[[i]]+
+             theme(text = element_blank(),
+                   legend.position = "none"),
+           scale = 2,
+           width = 1.2,height = 1.2,units = "in",useDingbats=FALSE)
+    system(paste0("open ",fn))
+    fn=paste0("./figs/fig2/subfig2A_",select.gene[i],'_col',j,'.pdf')
+    ggsave(fn,p.default.cluster.motifs.2[[i]],
+           scale = 2,
+           width = 1.4,height = 1.2,units = "in",useDingbats=FALSE)
+    system(paste0("open ",fn))
+  }
 }
 
 
-plotLegend(cols = colorRampPalette(c(muted("blue"),"white",muted("red")))(50),
-           bks = seq(-5,5,length.out = 51),fnames = sub(".png","_scale.eps",fn)
-          )
-system(paste0("open ",sub(".png","_scale.eps",fn)))
 
 

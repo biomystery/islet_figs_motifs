@@ -41,7 +41,7 @@ dmotifs.list <- sapply(c("alpha","beta","delta"), function(x) subset(ttest.res,c
 tmp <- gplots::venn(dmotifs.list)
 dmotifs.list.inter <- attr(tmp,"intersections")
 
-# beta -------------------------------------------------------------
+# fig2B:beta hm -------------------------------------------------------------
 
 selected.motif <- list(`alpha`=c(dmotifs.list.inter[["alpha"]],
                                  dmotifs.list.inter[["alpha:delta"]]),
@@ -156,128 +156,7 @@ if(T){
   system(paste0("open ",fn))
 }
 
-# beta: pam cluster -------------------------------------------------------
-
-
-pa.b <- pam(mat.b,k=4,cluster.only = T)
-pa.b[pa.b==4] <- 1
-pa.b["NFYB"] <- 3
-#pa.b <- pam(mat.b,k=2,cluster.only = T)
-#pa.b[pa.b==3]<- 2
-
-ht.beta <- Heatmap(mat.b,split = pa.b,
-                   cluster_columns = F,
-                   cluster_rows = T,show_row_dend = F,
-                   col = cols.hm.avg.tf(50),
-                   show_column_names = F,
-                   #row_order = ord,
-                   #raster_device = "CairoPNG",
-                   row_names_gp=gpar(fontsize=5),name = "ht.beta")
-
-if(T){
-  #ord.b <- row_order(ht.beta)
-  #n.clusters <- sapply(c(1,2,3),function(x) sum(pa.b==x))
-  ord.b <- sapply(c(2,3,1),function(x){
-    tmp <- apply(mat.b[pa.b==x,],1,mean)
-    names(tmp)[order(tmp)]})
-  n.clusters <- sapply(c(2,3,1),function(x) sum(pa.b==x))
-  
-  
-  if(F){
-    png(filename = "hmp.pt.beta.smooth.png",height =4,
-        width = 6,units = 'in',res = 300)
-    layout(mat = matrix(c(1,2,3,4),4,1,byrow = T),
-           heights = c(1,n.clusters))
-    #n.clusters[2]<- 6
-    par(mgp=c(2,.3,0),mar=c(0,4,0,0)+0.1)
-    colr <- adjustcolor( brewer.pal(9,"Set1")[1:2],alpha.f = 0.2)
-    #colr <- cols.celltype[c('beta_1','beta_2')]
-    plot(pd.anno.b$pt,rep(1,nrow(pd.anno.b)),col=colr[pd.anno.b$subtype],xaxs="i",
-         yaxt='n',ylab="",xaxt='n',pch=20,cex=2,bty="n")
-    #axis(side = 1,at = seq(0,20,by = 5),tcl=-0.2,labels = NA)
-    
-    par(mgp=c(2,.3,0),mar=c(0.5,4,0,0)+0.1)
-    # par(mgp=c(2,.3,0),oma=c(0,0,0,0),mar=c(0.5,4,0,0)+0.1)
-    for(i in 1:2){
-      image(x=seq(0,pt.max.b,by = 0.05),y=1:length(ord.b[[i]]),z= t(mat.b[ord.b[[i]],]),col = cols.hm.avg.tf(50),
-            xlab='', yaxt="n",tcl=-0.2,ylab=NA,xaxt="n",yaxs='i',bty="o")
-      axis(side = 2,at = 1:length(ord.b[[i]]),tcl=-0.2,labels = ord.b[[i]],las=1,cex.axis=0.75,hadj = 1)
-      axis(side = 1,at = seq(0,pt.max.b,by = 5),tcl=-0.2,labels = NA)
-    }
-    dev.off()
-    system("open hmp.pt.beta.smooth.png")
-  }
-  
-  for(p.lab in c("label","no_label")){
-    for(p.format in c("png","pdf")){
-      wd = ifelse(p.lab=="no_label",2,6)
-      ht = ifelse(p.lab=="no_label",1.5,4)
-      fn<- paste0("./figs/fig2/hmp.pt.beta.smooth.",p.lab,".",p.format)
-      if(p.format=="png"){
-        png(filename = fn,height =ht,width = wd,units = 'in',res = 300)
-      }else{
-        pdf(file = fn,width = wd,height = ht)
-      }
-      
-      layout(mat = matrix(c(1,2,3,4),4,1,byrow = T),
-             heights = c(2,n.clusters))
-      n.clusters[2]<- 6
-      par(mgp=c(2,.3,0),mar=c(0,4,0,0)+0.1)
-      if(p.lab=="no_label") par(mgp=c(2,.3,0),mar=c(0,0,0,0)+0.1)
-      colr <- adjustcolor( brewer.pal(9,"Set1")[1:2],alpha.f = 0.2)
-      #colr <- cols.celltype[c('beta_1','beta_2')]
-      plot(pd.anno.b$pt,rep(1,nrow(pd.anno.b)),col=colr[pd.anno.b$subtype],xaxs="i",
-           yaxt='n',ylab="",xaxt='n',pch=20,cex=0.5,bty="n")
-      #ylim(c(0.9,1.1))
-      #box()
-      #axis(side = 1,at = seq(0,20,by = 5),tcl=-0.2,labels = NA)
-      
-      par(mgp=c(2,.3,0),mar=c(0.5,4,0,0)+0.1)
-      if(p.lab=="no_label") par(mgp=c(2,.3,0),mar=c(0,0,0,0)+0.1)
-      # par(mgp=c(2,.3,0),oma=c(0,0,0,0),mar=c(0.5,4,0,0)+0.1)
-      for(i in 1:3){
-        image(x=seq(0,pt.max.b,by = 0.05),y=1:length(ord.b[[i]]),z= t(mat.b[ord.b[[i]],]),col = cols.hm.avg.tf(50),
-              xlab='', yaxt="n",tcl=-0.2,ylab=NA,xaxt="n",yaxs='i',bty="o")
-        axis(side = 2,at = 1:length(ord.b[[i]]),tcl=-0.2,labels = ord.b[[i]],las=1,cex.axis=0.75,hadj = 1)
-        axis(side = 1,at = seq(0,pt.max.b,by = 5),tcl=-0.2,labels = NA)
-      }
-      dev.off()
-      system(paste0("open ",fn))
-    }
-  }
-}
-
-if(F){
-  ht.beta <- Heatmap(mat.b,split =factor(pa.b,levels=c(2,3,1)),cluster_columns = F,
-                     col = cols.hm.avg.tf(50),show_column_names = F,
-                     cluster_rows = F,row_order = ord.b,
-                     #raster_device = "CairoPNG",
-                     row_names_gp=gpar(fontsize=5),name = "ht")
-  #pdf("hmp.pt.beta.smooth.pdf",height = 4,width = 6)
-  png(filename = "hmp.pt.beta.smooth.png",height =4,width = 6,units = 'in',res = 300)
-  print(ht.beta)
-  dev.off()
-  system("open hmp.pt.beta.smooth.png")
-}
-
-
-
-if(T){
-  select.gene <- c("FOS::JUN","STAT3","NKX6-1","TEAD1")
-  
-  p.egs <-ggplot(output.motif.pt%>% 
-                   filter(type=="beta",motif.name%in% select.gene)%>%
-                   mutate(motif.name =factor(motif.name,levels = select.gene)),
-                 aes(pt,zval,color=motif.name)) +
-    geom_smooth()+theme_light()+ facet_wrap(~motif.name,scales = "free_y",ncol = 2)+
-    coord_cartesian(expand = F)
-  ggsave(filename = "beta.pt2.egs.png",width = 6,height = 6,plot = p.egs+theme(legend.position = "none"))   
-  system("open beta.pt2.egs.png")
-}
-
-
-
-# alpha -------------------------------------------------------------------
+# fig2B:alpha hm-------------------------------------------------------------------
 pt.max.a <- max((output.motif.pt%>%filter(type=="alpha"))$pt)
 
 system.time(smoothed.motif.pt.alpha <- mclapply(unlist(selected.motif),function(x){
@@ -300,11 +179,9 @@ pd.anno.a <-output.motif.pt%>%
   mutate(subtype=as.factor(subtype))%>%
   as.data.frame()
 
-require(cluster)
-
 
 mat.a <- smoothed.motif.pt.alpha.mat.scaled[c(selected.motif$alpha,selected.motif$`alpha:beta`),]
-pt.max.b <- max((output.motif.pt%>%filter(type=="alpha"))$pt)
+pt.max.a <- max((output.motif.pt%>%filter(type=="alpha"))$pt)
 
 
 h <- pheatmap(mat.a,cluster_cols = F,show_colnames = F)
@@ -314,8 +191,8 @@ n.clusters <- nrow(mat.a)
 
 for(p.lab in c("label","no_label")){
   for(p.format in c("png","pdf")){
-    wd = ifelse(p.lab=="no_label",2,6)
-    ht = ifelse(p.lab=="no_label",1.5,4)
+    wd = ifelse(p.lab=="no_label",2,6*1.5)
+    ht = ifelse(p.lab=="no_label",1.5,4*1.5)
     fn<- paste0("./figs/fig2/subfig2B_alpha_hm",p.lab,".",p.format)
     if(p.format=="png"){
       png(filename = fn,height =ht,width = wd,units = 'in',res = 600)
@@ -331,8 +208,8 @@ for(p.lab in c("label","no_label")){
     
     if(p.lab=="label")  par(mar=c(0,4,0,0)+0.1)
     
-    plot(pd.anno.b$pt,rep(1,nrow(pd.anno.b)),
-         col=colr[pd.anno.b$subtype],xaxs="i",
+    plot(pd.anno.a$pt,rep(1,nrow(pd.anno.a)),
+         col=colr[pd.anno.a$subtype],xaxs="i",
          yaxt='n',ylab="",xaxt='n',pch=20,
          cex=ifelse(p.lab=="label",2,.5),
          bty="n")
@@ -345,11 +222,12 @@ for(p.lab in c("label","no_label")){
     t_labs <- NA
     if(p.lab=="label"){
       r_labs=names(ord.a)
-      title(xlab = "Pseudo-time");t_labs=seq(0,pt.max.b,by = 5)}
+      title(xlab = "Pseudo-time");t_labs=seq(0,pt.max.b,by = 5)
+      axis(side = 2,at = 1:length(ord.a),tcl=-0.2,
+           labels = r_labs,
+           las=1,cex.axis=0.5,hadj = 1)
+      }
     
-    #axis(side = 2,at = 1:length(ord.a),tcl=0,
-    #     labels = r_labs,
-     #    las=1,cex.axis=0.5,hadj = 1)
     axis(side = 1,at = seq(0,pt.max.b,by = 5),tcl=-0.2,labels = t_labs)
     
     dev.off()
@@ -357,98 +235,78 @@ for(p.lab in c("label","no_label")){
   }
 }
 
-pdf(file = './figs/fig2/subfig2B_beta_hm_p.pdf')
+pdf(file = './figs/fig2/subfig2B_alpha_hm_p.pdf')
 pheatmap(mat.a[ord.a,],cluster_rows = F,cluster_cols = F,show_colnames = F)
 dev.off()
 
 
 
 
-# Alpha:pam cluster -------------------------------------------------------
 
-
-pa.a <- pam(mat.a,k=2,cluster.only = T)
-ht.alpha <- Heatmap(mat.a,split = pa.a,
-                    cluster_columns = F,
-                    cluster_rows = T,show_row_dend = F,
-                    col = cols.hm.avg.tf(50),
-                    show_column_names = F,
-                    #row_order = ord,
-                    #raster_device = "CairoPNG",
-                    row_names_gp=gpar(fontsize=5),name = "ht.alpha")
-
-ord <- row_order(ht.alpha)
-
-n.clusters <- sapply(ord,length)
-with_lab=F
-
-ord[[2]]<-rev(ord[[2]])
-for(p.lab in c("label","no_label")){
-  for(p.format in c("png","pdf")){
-    wd = ifelse(p.lab=="no_label",2,6)
-    ht = ifelse(p.lab=="no_label",1.5*109/66,4*109/66)
-    fn<- paste0("./figs/fig2/hmp.pt.alpha.smooth.",p.lab,".",p.format)
-    if(p.format=="png"){
-      png(filename = fn,height =ht,width = wd,units = 'in',res = 600)
-    }else{
-      pdf(file = fn,width = wd,height = ht)
-    }
-    
-    
-    colr <- adjustcolor( brewer.pal(9,"Set1")[1:2],alpha.f = 0.2)
-    
-    par(mgp=c(1,.3,0),mar=c(0,.4,0,0)+0.1)
-    layout(mat = matrix(c(1,2,3),3,1,byrow = T),
-           heights = c(2*109/66,n.clusters))
-    
-    if(p.lab=="label")  par(mar=c(0,4,0,0)+0.1)
-    
-    plot(pd.anno.a$pt,rep(1,nrow(pd.anno.a)),
-         col=colr[pd.anno.a$subtype],xaxs="i",
-         yaxt='n',ylab="",xaxt='n',pch=20,
-         cex=ifelse(p.lab=="label",2,.5),
-         bty="n")
-    
-    par(mar=c(0,.4,0,0)+0.1)
-    if(p.lab=="label")    par(mar=c(0.5,4,0,0)+0.1)
-    
-    
-    for(i in 1:2){
-      if(i==2 & p.lab=="label") par(mar=c(2.5,4,0,0)+0.1)
-      image(x=seq(0,pt.max.a,by = 0.05),y=1:length(ord[[i]]),z= t(mat.a[rev(ord[[i]]),]),col = cols.hm.avg.tf(50),
-            xlab='', yaxt="n",tcl=-0.2,ylab=NA,xaxt="n",yaxs='i',bty="o",useRaster=F)
-      r_labs <- NA
-      t_labs <- NA
-      if(p.lab=="label"){
-        r_labs=rownames(mat.a)[rev(ord[[i]])]
-        if(i==2) {title(xlab = "Pseudo-time");t_labs=seq(0,pt.max.a,by = 5)}
-      }
-      axis(side = 2,at = 1:length(ord[[i]]),tcl=-0.2,
-           labels = r_labs,
-           las=1,cex.axis=0.5,hadj = 1)
-      axis(side = 1,at = seq(0,pt.max.a,by = 5),tcl=-0.2,labels = t_labs)
-    }
-    dev.off()
-    system(paste0("open ",fn))
-  }
-}
-
-
+# fig2B:alpha_egs ----------------------------------------------------------------
 
 if(T){
   select.gene <- c("FOS::JUN","STAT3","NKX6-1","TEAD1")
-  select.gene <- c("MAFK","MAFG","MAFF")
+  select.gene <- c("RFX3","FOSL1")
   p.egs <-ggplot(output.motif.pt%>% 
                    filter(type=="alpha",motif.name%in% select.gene)%>%
                    mutate(motif.name =factor(motif.name,levels = select.gene)),
-                 aes(pt,zval,color=motif.name)) +
-    geom_smooth()+theme_light()+ facet_wrap(~motif.name,scales = "free_y",ncol = 2)+
-    coord_cartesian(expand = F)
+                 aes(pt,zval)) +
+    geom_smooth(color="black")+
+    facet_wrap(~motif.name,scales = "free_y",ncol = 1)+
+    coord_cartesian(expand = F)+
+    scale_x_continuous(breaks = c(0,5))+
+  theme_bw()
   
-  
-  ggsave(filename = "alpha.pt2.egs.png",width = 6,height = 6,plot = p.egs+theme(legend.position = "none"))   
-  system("open alpha.pt2.egs.png")
+  fn <- "./figs/fig2/subfig2B_alpha_egs_lab.pdf"
+  ggsave(filename = fn,width = 2,height = 2,
+         plot = p.egs+theme(legend.position = "none"),
+        scale = 2)   
+  system(paste0("open ",fn))
+  fn <- "./figs/fig2/subfig2B_alpha_egs.pdf"
+  ggsave(filename = fn,width = 2.5,height = 2.5,
+         plot = p.egs+theme(legend.position = "none",
+                            text = element_blank(),
+                            plot.margin =margin(b=.1,l=.5,t=.1,r = .1,unit = "points"))
+         ,
+         scale = 2)  
+  #par(mar=c(0,.4,0,0)+0.1)
+  system(paste0("open ",fn))
 }
+
+
+# fig2B:beta_egs ----------------------------------------------------------------
+
+if(T){
+  select.gene <- c("FOS::JUN","STAT3","NKX6-1","TEAD1")
+  select.gene <- c("RFX3","FOSL1")
+  p.egs <-ggplot(output.motif.pt%>% 
+                   filter(type=="beta",motif.name%in% select.gene)%>%
+                   mutate(motif.name =factor(motif.name,levels = select.gene)),
+                 aes(pt,zval)) +
+    geom_smooth(color="black")+
+    facet_wrap(~motif.name,scales = "free_y",ncol = 1)+
+    coord_cartesian(expand = F)+
+    scale_x_continuous(breaks = c(0,5,10,15,20))+
+    theme_bw()
+  
+  fn <- "./figs/fig2/subfig2B_beta_egs_lab.pdf"
+  ggsave(filename = fn,width = 2,height = 2,
+         plot = p.egs+theme(legend.position = "none"),
+         scale = 2)   
+  system(paste0("open ",fn))
+  fn <- "./figs/fig2/subfig2B_beta_egs.pdf"
+  ggsave(filename = fn,width = 2.5,height = 2.5,
+         plot = p.egs+theme(legend.position = "none",
+                            text = element_blank(),
+                            plot.margin =margin(b=.1,l=.5,t=.1,r = .1,
+                                                unit = "points"))
+         ,
+         scale = 2)  
+  #par(mar=c(0,.4,0,0)+0.1)
+  system(paste0("open ",fn))
+}
+
 
 promoter.cpm <- fread('../../atacMotif/test/promoter.cpm.csv',header = T)
 

@@ -41,11 +41,47 @@ if(F){
   plotColScale(cols.hm.zval.fun(60))
 par(mfrow=c(1,1))
 }
+
+#https://eos.org/features/the-end-of-the-rainbow-color-schemes-for-improved-data-graphics
+fun.importRGB<- function(r,g,b) rgb(r,g,b,maxColorValue = 255)
+cols.BlGy<- c(fun.importRGB(19,146,218),
+                                      fun.importRGB(84,181,233),
+                                      fun.importRGB(140,204,231),
+                                      fun.importRGB(196,227,242),
+                                      fun.importRGB(220,221,227),
+                                      fun.importRGB(142,147,153),
+                                      fun.importRGB(96,103,108),
+                                      fun.importRGB(51,59,60))
+
+cols.Spectrum<- colorRampPalette(c(fun.importRGB(153,25,51), #n=11
+                               fun.importRGB(199,53,66),
+                               fun.importRGB(229,115,99),
+                               fun.importRGB(237,171,121),
+                               fun.importRGB(248,217,157),
+                               fun.importRGB(242,239,192),
+                               fun.importRGB(219,233,239),
+                               fun.importRGB(160,210,237),
+                               fun.importRGB(96,183,231),
+                               fun.importRGB(20,147,217),
+                               fun.importRGB(15,84,164)))
+
+cols.sky <- c(fun.importRGB(195,86,26),
+              fun.importRGB(201,107,24),
+              fun.importRGB(221,162,19),
+              fun.importRGB(242,213,9),
+              fun.importRGB(251,239,212),
+              fun.importRGB(252,252,252),
+              fun.importRGB(152,200,236),
+              fun.importRGB(96,158,214),
+              fun.importRGB(77,133,193),
+              fun.importRGB(68,104,171),
+              fun.importRGB(62,82,150))
 # functions ---------------------------------------------------------------
 
 fun.plot.project.motif <- function(motif,input.chromVar.z=input.chromVar.jaspar.z,
                                    umap.res=input.umap.res,
-                                   rescale=F){
+                                   rescale=F,
+                                   cls=rev(cols.Spectrum(8))){
   require(scales)
   
   
@@ -70,7 +106,8 @@ fun.plot.project.motif <- function(motif,input.chromVar.z=input.chromVar.jaspar.
   p.default.cluster.motif <-  ggplot(tmp,aes(UMAP1,UMAP2)) + 
     geom_point(aes(colour=zval),size=.5,shape=16) + 
     ggtitle(rownames(input.chromVar.jaspar.z)[motif.idx])+
-    scale_colour_gradient2(low=muted("blue"),high=muted("red"))+
+    #scale_colour_gradient2(low=muted("blue"),high=muted("red"))+
+    scale_color_gradientn(colours = cls)+
     theme_light()
   p.default.cluster.motif
 }
