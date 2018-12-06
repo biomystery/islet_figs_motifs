@@ -168,11 +168,11 @@ for(m in select.gene){
     theme_light()+
     coord_cartesian(expand = T)
   fn<- paste0("figs/fig2/subfig2A_",m,"_violion.pdf")
-  ggsave(p,filename = fn,width = 1.5,height = 1,scale = 5)
+  ggsave(p,filename = fn,width = 1.5,height = 1,scale = 5,useDingbats = F)
   system(paste0("open ",fn))
   fn <-  paste0("figs/fig2/subfig2A_",m,"_violion_nolab.pdf")
   ggsave(p+theme(text = element_blank(),legend.position = "none"),
-         filename = fn,width = 1.5,height = 1,scale = 5)
+         filename = fn,width = 1.5,height = 1,scale = 5,useDingbats = F)
   system(paste0("open ",fn))
   
 }
