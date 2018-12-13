@@ -112,12 +112,12 @@ for (j in 1:2){
                    legend.position = "none"),
            scale = 2,
            width = 1.2,height = 1.2,units = "in",useDingbats=FALSE)
-    system(paste0("open ",fn))
+    #system(paste0("open ",fn))
     fn=paste0("./figs/fig2/subfig2A_",select.gene[i],'_col',j,'.pdf')
     ggsave(fn,p.default.cluster.motifs.2[[i]],
            scale = 2,
            width = 1.4,height = 1.2,units = "in",useDingbats=FALSE)
-    system(paste0("open ",fn))
+    #system(paste0("open ",fn))
   }
 }
 
