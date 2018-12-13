@@ -156,7 +156,7 @@ output.jaspar.z<- input.chromVar.jaspar.z.agg%>%
   select(one_of(c("rn","zval","cluster","cell_type_overall","subtype")))%>%
   separate(rn,into = c("Jaspar.id","Motif.name"),sep = "_")
   
-select.gene <- c("FOSL1","FOS::JUN","RFX3","TAL1::TCF3","STAT3","NKX6-1","TEAD1","TEAD2","TEAD3")  
+select.gene <- c("FOSL1","FOS::JUN","RFX3","TAL1::TCF3","STAT3","NKX6-1","TEAD1","TEAD3")  
 for(m in select.gene){
   p<-ggviolin(output.jaspar.z%>%
                 filter(Motif.name==m),
