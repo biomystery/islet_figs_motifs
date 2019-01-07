@@ -159,7 +159,6 @@ fun.plt.motif.pt <- function(x="alpha",selected.motif=NULL,
 
 fun.gamSmooth <- function(tc,new.tps = seq(0,20,by=0.05)){
   require(mgcv)
-  tc.s <- gam(zval~s(pt,bs="cs"),data = tc)
   tc.fit <- gam(zval~s(pt,bs="cs"),data = tc)
   predict(tc.fit,newdata = data.frame(pt=new.tps))
 }

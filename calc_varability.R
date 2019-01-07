@@ -127,8 +127,6 @@ ggplot(pd.variablility.mannual,
 
 # compare subtypes --------------------------------------------------------
 
-
-
 fun.ttest.motif.cellsubtypes <- function(celltype="alpha",motif="NFIL3",...){
   test.dat <- output.jaspar.z%>%
     filter(subtype!="3")%>%

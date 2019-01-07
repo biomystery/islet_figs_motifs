@@ -3,3 +3,4 @@ dat/*
 figs/*
 *DS_Store
 .RData*
+.Rproj.user
