@@ -34,14 +34,24 @@ p+ facet_wrap(~celltype)
 
 require(ggpubr)
 
+dat.prom.max.wd <- dat.prom.max%>%
+  spread(key = "celltype",value = "max.percent")
+
+apply(dat.prom.max.wd[,-1], 2,quantile)
+
 p<-ggscatterhist(
   dat.prom.max%>%
     spread(key = "celltype",value = "max.percent"), x = "alpha", y = "beta", 
-  size=1,alpha = 0.6
+  size=1,alpha = 0.6,
   #color = "Species", # comment out this and last line to remove the split by species
   #margin.plot = "histogram", # I'd suggest removing this line to get density plots
   #margin.params = list(fill = "Species", color = "black", size = 0.2)
+  ggtheme = theme_bw()
 )
+
+ggsave("bin.max.percent.scatter.pdf",p,useDingbats = F,width = 6,height = 6)
+
+apply(dat.prom.max.wd[,-1], 2,function(x)quantile(x,probs=c(0,.05,.25,.50,.75,.95,1)))
 
 # filter ------------------------------------------------------------------
 dat.prom.keep <- dat.prom%>%
@@ -156,7 +166,7 @@ prom.DEG.res <- rbind(data.frame(alpha.ttest.res%>% filter(FDR <0.05),celltype="
   ,data.frame(beta.ttest.res%>% filter(FDR <0.05),celltype="beta"))
 
 fwrite(prom.DEG.res,"prom.DEG.res.csv")
-system("open prom.DEG.res.csv")
+system("open ./dat/prom.DEG.res.csv")
 
 
 # Prom_hm -----------------------------------------------------------------
