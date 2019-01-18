@@ -4,3 +4,4 @@ figs/*
 *DS_Store
 .RData*
 .Rproj.user
+.ipynb_checkpoints
