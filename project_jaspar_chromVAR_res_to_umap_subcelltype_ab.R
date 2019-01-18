@@ -23,7 +23,15 @@ input.umap.res <- readRDS("./dat/res.umap.Rdata")
 
 
 # add Z score of motifs  -------------------------------------------------
+
+
 input.umap.res.sub <- subset(input.umap.res,cluster %in% select.celltypes)
+umap.filter <-   input.umap.res.sub$UMAP1 > -7 & input.umap.res.sub$UMAP1 < -3 & input.umap.res.sub$UMAP2 < -.8 
+sum(umap.filter)
+
+input.umap.res.sub <- input.umap.res.sub%>% 
+  filter(!umap.filter)
+fwrite(input.umap.res.sub,file = "./dat/output.umap.ab.filtered.csv")
 
 p.default.cluster.sub <-  ggplot(input.umap.res.sub,aes(UMAP1,UMAP2)) + 
   geom_point(aes(colour=cluster),size=1,alpha=0.6) + 
