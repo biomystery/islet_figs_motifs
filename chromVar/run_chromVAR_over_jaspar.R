@@ -16,7 +16,7 @@ set.seed(1098)
 ##------------------------------------------------------------
 ## inputs
 ##------------------------------------------------------------
-iutput.SE.for.chromVar.filtered <- saveRDS("output.SE.for.chromVar.filtered.Rdata")
+iutput.SE.for.chromVar.filtered <- readRDS("output.SE.for.chromVar.filtered.Rdata")
 input.motifs <- getJasparMotifs()
 
 system.time(motif_ix <- matchMotifs(input.motifs, iutput.SE.for.chromVar.filtered, genome = BSgenome.Hsapiens.UCSC.hg19))

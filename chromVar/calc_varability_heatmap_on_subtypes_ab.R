@@ -1,10 +1,11 @@
 ## input: 1. summarizedExperiement(SE) obj for chromVAR 2. Jaspar matrix 
 ## output: 1. motif x cell (z score) 2. plot: ranked           
+setwd("./chromVar/")
 source("./libs.R")
 
 # combine -----------------------------------------------------------------
 
-ttest.res <- fread("./dat/ttest.res.csv")
+ttest.res <- fread("../dat/ttest.res.csv")
 
 dmotifs.list <- sapply(c("alpha","beta"), function(x) subset(ttest.res,celltype==x & selected)$motif)
 tmp <- gplots::venn(dmotifs.list)
@@ -12,10 +13,10 @@ dmotifs.list.inter <- attr(tmp,"intersections")
 
 
 # Plot_hm -----------------------------------------------------------------\
-input.chromVar.res.list <- readRDS(file = "./dat/output.jaspar.dev.res.Rdata")
+input.chromVar.res.list <- readRDS(file = "../dat/output.jaspar.dev.res.Rdata")
 input.chromVar.jaspar.z <- data.table(assays(input.chromVar.res.list$dev)$z,keep.rownames = T)
 rm(input.chromVar.res.list)
-input.umap.res <- fread('./dat/Islet_123.MNN_corrected.UMAP.txt',header = T)
+input.umap.res <- fread('../dat/Islet_123.MNN_corrected.UMAP.txt',header = T)
 
 
 # filter unkonwn
@@ -59,7 +60,6 @@ splt <- unlist(sapply(names(dmotifs.list.inter), function(x){
 
 
 # fig2A:hm_split ----------------------------------------------------------------
-
 if(T){
   ht <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
                col=cols.hm.avg.tf(30),cluster_columns = F,
@@ -67,7 +67,7 @@ if(T){
                row_names_gp=gpar(fontsize=5),name = "ht"
   )
   
-  fn <- "./figs/fig2/subfig2A_hm_split.pdf"
+  fn <- ".subfig2A_hm_split.pdf"
   pdf(fn,height = 10,width = 3)
   print(ht)
   decorate_heatmap_body("ht", {
@@ -84,7 +84,7 @@ if(T){
                      name = "ht.nolab",show_heatmap_legend = F,show_row_dend = F,combined_name_fun = NULL
   )
   
-  fn <- "./figs/fig2/subfig2A_hm_split_nolab.pdf"
+  fn <- "./subfig2A_hm_split_nolab.pdf"
   pdf(file = fn,height = 4,width = 1.78)
   #png(filename = "./figs/fig2/hmp.subcelltype.nolab.png",height = 4,width = 1.78,units = 'in',res = 300)
   print(ht.nolab)
@@ -130,6 +130,10 @@ if(T){
   })
   dev.off()
   system(paste0("open ",fn))
+  
+  saveRDS(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],file = "../figcode/fig_2B.motif_heatmap_ab.Rds")
+  fwrite(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),][row_order(ht.nosplit.nolab)[[1]],],file ="../figcode/fig_2B.motif_heatmap_ab.csv",row.names = T)
+  
 }
 
 
@@ -155,7 +159,10 @@ output.jaspar.z<- input.chromVar.jaspar.z.agg%>%
   filter(subtype!="3")%>%
   select(one_of(c("rn","zval","cluster","cell_type_overall","subtype")))%>%
   separate(rn,into = c("Jaspar.id","Motif.name"),sep = "_")
-  
+
+output.jaspar.z$cluster <- (Hmisc::capitalize(sub("_"," ", output.jaspar.z$cluster)))
+fwrite(output.jaspar.z,file = '../figcode/fig_2B.motif_violin_ab.csv') 
+
 select.gene <- c("FOSL1","FOS::JUN","RFX3","TAL1::TCF3","STAT3","NKX6-1","TEAD1","TEAD3")  
 for(m in select.gene){
   p<-ggviolin(output.jaspar.z%>%
