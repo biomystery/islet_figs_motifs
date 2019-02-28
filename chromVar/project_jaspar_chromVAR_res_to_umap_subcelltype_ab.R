@@ -33,6 +33,7 @@ input.umap.res.sub <- input.umap.res.sub%>%
   filter(!umap.filter)
 fwrite(input.umap.res.sub,file = "./dat/output.umap.ab.filtered.csv")
 
+#input.umap.res.sub <- fread("../dat/output.umap.ab.filtered.csv")
 p.default.cluster.sub <-  ggplot(input.umap.res.sub,aes(UMAP1,UMAP2)) + 
   geom_point(aes(colour=cluster),size=1,alpha=0.6) + 
   scale_color_manual(values = cols.celltype) +
