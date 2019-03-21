@@ -7,7 +7,7 @@ source("./libs.R")
 
 ttest.res <- fread("../dat/ttest.res.csv")
 
-dmotifs.list <- sapply(c("alpha","beta"), function(x) subset(ttest.res,celltype==x & selected)$motif)
+dmotifs.list <- sapply(c("alpha","beta","delta"), function(x) subset(ttest.res,celltype==x & selected)$motif)
 tmp <- gplots::venn(dmotifs.list)
 dmotifs.list.inter <- attr(tmp,"intersections")
 
@@ -31,7 +31,7 @@ input.chromVar.jaspar.z.agg <- melt(input.chromVar.jaspar.z,
 input.chromVar.jaspar.z.agg <- merge(input.chromVar.jaspar.z.agg,input.umap.res)
 
 output.chromvar.jaspar.z.avg_by_subct<-  
-  input.chromVar.jaspar.z.agg[cell_type_overall %in% c("alpha","beta") & subtype!=3,
+  input.chromVar.jaspar.z.agg[cell_type_overall %in% c("alpha","beta","delta") & subtype!=3,
                               .(zval_avg=mean(zval)),by=.(rn,cluster)]%>%
   group_by(rn)%>%
   mutate(zval_avg = (zval_avg-min(zval_avg))/(max(zval_avg)-min(zval_avg)))%>%
@@ -63,7 +63,7 @@ splt <- unlist(sapply(names(dmotifs.list.inter), function(x){
 if(T){
   ht <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
                col=cols.hm.avg.tf(30),cluster_columns = F,
-               split = factor(splt,levels = c("alpha","beta","alpha:beta")),
+               split = factor(splt,levels = c("alpha","beta","delta","alpha:beta","alpha:delta","beta:delta","alpha:beta:delta")),
                row_names_gp=gpar(fontsize=5),name = "ht"
   )
   
@@ -102,19 +102,21 @@ if(T){
 if(T){
   ht.nosplit <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
                        col=cols.hm.avg.tf(30),cluster_columns = F,
-                       row_names_gp=gpar(fontsize=5),name = "ht.nosplit",
+                       row_names_gp=gpar(fontsize=4),name = "ht.nosplit",
                        heatmap_legend_param = list(title = NULL,legend_height= unit(4, "cm"),
                                                    labels_gp = gpar(fontsize = 5))
   )
   
-  fn="./figs/fig2/subfig2A_hm.pdf"
+  fn="/Users/frank/Dropbox (UCSD_Epigenomics)/Islet_snATAC/panel_pdfs/sfigs/fig_s2.motif.hm.with.detla.pdf"
   pdf(fn,height = 10,width = 3)
   print(ht.nosplit)
-  decorate_heatmap_body("ht.nosplit", {
-    grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
-  })
+  #decorate_heatmap_body("ht.nosplit", {
+  #  grid.lines(c(1/2,1/2), c(-4,1), gp = gpar(lty = 2, lwd = 2,col="white"))
+  #})
   dev.off()
   system(paste0("open ",fn))
+  fwrite(data.frame(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],cate=splt)[row_order(ht.nosplit)[[1]],],
+         "/Users/frank/Dropbox (UCSD_Epigenomics)/Islet_snATAC/panel_pdfs/sfigs/fig_s2.motif.hm.with.detla.csv",row.names = T)
 
   ht.nosplit.nolab <-Heatmap(output.chromvar.jaspar.z.avg_by_subct[unique(unlist(dmotifs.list.inter)),],
                              col=cols.hm.avg.tf(30),cluster_columns = F,
