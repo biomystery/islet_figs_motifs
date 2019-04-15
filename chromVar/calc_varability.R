@@ -259,7 +259,7 @@ delta.ttest.res <- delta.ttest.res%>%
 
 fwrite(delta.ttest.res,file = "delta.ttest.res.csv")
 
-
+delta.ttest.res <- fread("./dat/delta.ttest.res.csv")
 delta.ttest.res.pd <- delta.ttest.res
 min.Fdr <- min(delta.ttest.res.pd$FDR[delta.ttest.res.pd$FDR!=0])
 delta.ttest.res.pd$FDR[delta.ttest.res.pd$FDR<min.Fdr]<- min.Fdr
@@ -278,9 +278,9 @@ ggplot(delta.ttest.res.pd,
   geom_text(data = delta.ttest.res.pd[delta.ttest.res$FDR< min.Fdr,],
             aes(label=motif),nudge_x = 0,nudge_y = -0.05,angle=-90,size=3,hjust=0)
 
-motif.list <- beta.ttest.res.pd[delta.ttest.res.pd$selected,]$motif
+motif.list <- delta.ttest.res.pd[delta.ttest.res.pd$selected,]$motif
 plot.ggviolin(motif.list[1:12],
-              celltype = "beta")+ 
+              celltype = "delta")+ 
   facet_wrap(~motif.name)+
   theme(legend.position = "none")
 

@@ -148,7 +148,7 @@ new_res <- do.call(rbind,new_res)%>%
   spread(key = x,value = percent)%>%
   column_to_rownames("g")
 
-
+fwrite(new_res,file = "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-03-18_dat_figs/fig2E_fos_jun_alpha_smoothed.ps.csv",row.names  = T)
 new_res_scale <- t(apply(new_res,1,function(x) (x-min(x))/(max(x)-min(x))))
 
 if(T){
@@ -214,6 +214,7 @@ new_res <- do.call(rbind,new_res)%>%
   spread(key = x,value = percent)%>%
   column_to_rownames("g")
 
+fwrite(new_res,file = "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-03-18_dat_figs/fig2E_fos_jun_beta_smoothed.ps.csv",row.names = T)
 
 new_res_scale <- t(apply(new_res,1,function(x) (x-min(x))/(max(x)-min(x))))
 
