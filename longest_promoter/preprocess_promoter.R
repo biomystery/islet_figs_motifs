@@ -1,4 +1,4 @@
-source("./libs.R")
+source("./chromVar/libs.R")
 
 # get tfclss  -------------------------------------------------------------
 tfclass.db <- readRDS("../../atacMotif/db/tfclass.rds")
