@@ -1,8 +1,8 @@
 source("./chromVar/libs.R")
 
 # get tfclss  -------------------------------------------------------------
-tfclass.db <- readRDS("../../atacMotif/db/tfclass.rds")
-tfclass.dic <- readRDS("../../atacMotif/db/dic_jaspar_tfclass.rds")
+tfclass.db <- readRDS("~/github/atacMotif/db/tfclass.rds")
+tfclass.dic <- readRDS("~/github//atacMotif/db/dic_jaspar_tfclass.rds")
 
 get_subfamily <- function(g="RFX3",db=tfclass.db){
   idx <- which(toupper(tfclass.db$merge$tf.symbol)==g)
@@ -48,6 +48,8 @@ plot_tf_prom <- function(tf,add_point=F,free_y=F){
 
 
 # generate motif pseudo time bin  -----------------------------------------
+# from plot_chromVAR_over_psedoTime3.R
+
 output.motif.pt.bin<-rbind(output.motif.pt%>%
                              filter(type=='alpha')%>%
                              mutate(pt_bin=as.numeric(cut(pt,breaks = seq(0-0.00001,pt.max.a+0.00001,length.out = 100)))),
@@ -64,6 +66,7 @@ pd.a <- t(apply((output.motif.pt.bin.wc%>% filter(type=="alpha"))[,-c(1,2)],1,
 rownames(pd.a) <-(output.motif.pt.bin.wc%>% filter(type=="alpha"))$motif.name
 pheatmap(pd.a,
          cluster_cols =  F)
+
 # alpha data  -------------------------------------------------------------
 
 fn <- "./dat/alpha.100_bin_pseudotime_raw.promoter.txt"
@@ -88,6 +91,7 @@ for(x in c("nop","wp")){
 
 # subfig2E_alpha_prom_1 ---------------------------------------------------
 gs<- get_subfamily(g = "NEUROD2",db = tfclass.db)
+gs<- get_subfamily(g = "RFX3",db = tfclass.db)
 gs$genus.name <- sub("NGN[1-3]\\/","",gs$genus.name)
 res <- plot_tf_prom(tf = gs$genus.name,free_y = F,add_point = a);print(res$plt)
 new_res <- lapply(gs$genus.name ,function(g)
@@ -98,12 +102,14 @@ new_res <- do.call(rbind,new_res)%>%
 
 
 
-pdf(file = "./figs/subfig2e_alpha_prom_1.pdf")
-print(res$plt)
+fn<- "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_rfx3_alpha_smoothed_prom_100bins.ps.pdf"
+fn<- "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_neurod2_alpha_smoothed_prom_100bins.ps.pdf"
+pdf(file = fn)
+#print(res$plt)
 #bks <- c(0,5,seq(10,,length.out = 47),36)
-bks <- c(0,seq(3,30,length.out = 48),36)
+bks <- c(0,seq(3,30,length.out = 48),51)
 p<- pheatmap(new_res,scale = "none",
-         breaks = bks,
+#         breaks = bks,
          cluster_cols = F,
          cluster_rows = T,
          #annotation_row = data.frame(apply(new_res, 1, max)),
@@ -112,12 +118,12 @@ p<- pheatmap(new_res,scale = "none",
          cellheight = 10,cellwidth = 2,
          color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(51))
 dev.off()
-system("open ./figs/subfig2e_alpha_prom_1.pdf")
+system(paste0("open ",fn))
 if(T){
   setEPS()
   postscript(file = "./figs/subfig2e_alpha_prom_1.eps",width = 2,height =1.5)
   #bks <- c(0,5,seq(10,,length.out = 47),36)
-  bks <- c(0,seq(3,30,length.out = 48),36)
+  bks <- c(0,seq(3,33,length.out = 48),36)
   pheatmap(new_res[p$tree_row$order,],scale = "none",
            breaks = bks,
            legend = F,
@@ -139,6 +145,8 @@ do.call(rbind,
         apply(new_res, 1, function(x)data.frame(min=min(x),max=max(x),rg=max(x)-min(x))))
 sink()
 
+fwrite(new_res,file = "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_neurod2_alpha_smoothed_prom_100bins.ps.csv",row.names = T)
+fwrite(new_res,file = "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_rfx3_alpha_smoothed_prom_100bins.ps.csv",row.names = T)
 
 # subfig2E_alpha_prom_2 ---------------------------------------------------
 res <- plot_tf_prom(c("JUN","JUNB","JUND","FOS","FOSB","FOSL1","FOSL2"),free_y = F,add_point = a);print(res$plt)
@@ -204,9 +212,6 @@ for(x in c("nop","wp")){
 
 
 # subfig2E_beta_motif_prom_2 ------------------------------------------------
-get_subfamily(g = "FRA1",db = tfclass.db)
-get_subfamily(g = "JUNB",db = tfclass.db)
-
 res <- plot_tf_prom(c("JUN","JUNB","JUND","FOS","FOSB","FOSL1","FOSL2"),free_y = F,add_point = a);print(res$plt)
 new_res <- lapply(c("FOSL2","FOSL1","FOSB","FOS","JUN","JUND","JUNB"),function(g)
   data.frame(x=1:100,g=g,percent=predict(loess(percent~x, data=res$plt$data%>%filter(gene==g)))))
@@ -276,68 +281,63 @@ if(F){
 
 # subfig2E_beta_motif_prom_1 ------------------------------------------------
 
+gs<- get_subfamily(g = "NEUROD2",db = tfclass.db)
+gs$genus.name <- sub("NGN[1-3]\\/","",gs$genus.name)
 gs <- get_subfamily(g = "RFX3",db = tfclass.db)
-res <- plot_tf_prom("RFX3",free_y = F,add_point = a);print(res$plt)
 
-new_res <- lapply(paste0("RFX",seq(8,1)),function(g)
+res <- plot_tf_prom(tf = gs$genus.name,free_y = F,add_point = a);print(res$plt)
+new_res <- lapply(gs$genus.name ,function(g)
   data.frame(x=1:100,g=g,percent=predict(loess(percent~x, data=res$plt$data%>%filter(gene==g)))))
 new_res <- do.call(rbind,new_res)%>%
   spread(key = x,value = percent)%>%
   column_to_rownames("g")
 
-new_res_scale <- t(apply(new_res,1,function(x) (x-min(x))/(max(x)-min(x))))
-pdf(file = "./figs/subfig2e_beta_prom_1.pdf")
-print(res$plt)
-bks <- c(0,seq(20,30,length.out = 48),40)
-pheatmap(new_res,scale = "none",
-         breaks = bks,
-         cluster_cols = F,
-         cluster_rows = F,
-         #annotation_row = data.frame(apply(new_res, 1, max)),
-         show_colnames = F,
-         border_color = NA,
-         cellheight = 10,cellwidth = 2,
-         color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(51))
 
-pheatmap(new_res_scale[c(3,7,8,6,2,5,1,4),],scale = "none",
-         cluster_cols = F,
-         cluster_rows = F,
-         annotation_row = data.frame(apply(new_res, 1, max)),
-         show_colnames = F,
-         border_color = NA,
-         cellheight = 10,
-         color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(51)) 
+fn<- "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_rfx3_beta_smoothed_prom_100bins.ps.pdf"
+fn<- "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_neurod2_beta_smoothed_prom_100bins.ps.pdf"
+pdf(file = fn)
+#print(res$plt)
+#bks <- c(0,5,seq(10,,length.out = 47),36)
+bks <- c(0,seq(3,30,length.out = 48),51)
+p<- pheatmap(new_res,scale = "none",
+             #         breaks = bks,
+             cluster_cols = F,
+             cluster_rows = T,
+             #annotation_row = data.frame(apply(new_res, 1, max)),
+             show_colnames = F,
+             border_color = NA,
+             cellheight = 10,cellwidth = 2,
+             color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(51))
 dev.off()
-sink("./figs/subfig2e_beta_prom_1.txt")
+system(paste0("open ",fn))
+if(T){
+  setEPS()
+  postscript(file = "./figs/subfig2e_alpha_prom_1.eps",width = 2,height =1.5)
+  #bks <- c(0,5,seq(10,,length.out = 47),36)
+  bks <- c(0,seq(3,33,length.out = 48),36)
+  pheatmap(new_res[p$tree_row$order,],scale = "none",
+           breaks = bks,
+           legend = F,
+           cluster_cols = F,
+           cluster_rows = F,
+           #annotation_row = data.frame(apply(new_res, 1, max)),
+           show_colnames = F,
+           show_rownames = F,
+           border_color = NA,
+           cellheight = 5,cellwidth =1,
+           color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(51))
+  dev.off()
+}
+
+
+sink("./figs/subfig2e_alpha_prom_1.txt")
 print(bks)
 do.call(rbind,
         apply(new_res, 1, function(x)data.frame(min=min(x),max=max(x),rg=max(x)-min(x))))
 sink()
-## raw 
-if(F){
-  raw_res <- res$plt$data%>%
-    spread(x,percent)%>%
-    column_to_rownames("gene")
-  
-  pheatmap(raw_res,scale = "none",
-           cluster_cols = F,
-           cluster_rows = T,
-           show_colnames = F,
-           border_color = NA,
-           cellheight = 10,
-           color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(21))                       
-  
-  raw_res_scale <- t(apply(raw_res,1,function(x) x/max(x)))
-  
-  pheatmap(raw_res_scale,scale = "none",
-           cluster_cols = F,
-           cluster_rows = T,
-           annotation_row = data.frame(apply(raw_res, 1, max)),
-           show_colnames = F,
-           border_color = NA,
-           cellheight = 10,
-           color = colorRampPalette(c("white",brewer.pal(9,"Reds")))(21)) 
-}
+
+fwrite(new_res,file = "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_neurod2_beta_smoothed_prom_100bins.ps.csv",row.names = T)
+fwrite(new_res,file = "/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_rfx3_beta_smoothed_prom_100bins.ps.csv",row.names = T)
 
 
 

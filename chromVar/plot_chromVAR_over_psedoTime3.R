@@ -7,7 +7,7 @@ source("./libs.R")
 ## output : 1. motif x (pseudotime,type)
 ##------------------------------------------------------------
 # 1. motif x cell - z
-input.chromVar.res.list <- readRDS(file = "../dat/output.jaspar.dev.res.Rdata")
+input.chromVar.res.list <- readRDS(file = "./dat/output.jaspar.dev.res.Rdata")
 input.chromVar.jaspar.z <- data.table(assays(input.chromVar.res.list$dev)$z,keep.rownames = T)%>%
   separate(rn,into=c("id","motif.name"),sep = "_")%>%
   select(-one_of("id"))
@@ -16,13 +16,13 @@ rm(input.chromVar.res.list)
 input.chromVar.jaspar.z <- melt(input.chromVar.jaspar.z,id="motif.name",variable.name = "barcodes",value.name = "zval")
 
 # cell,celltype
-input.umap.res <- fread('../dat/Islet_123.MNN_corrected.UMAP.txt',header = T)%>% 
+input.umap.res <- fread('./dat/Islet_123.MNN_corrected.UMAP.txt',header = T)%>% 
   select(one_of("barcodes","cluster"))%>%
   separate(cluster,into = c("cell_type_overall","subtype"),remove=F)
 input.umap.res[is.na(input.umap.res)]<-0
 
-input.alpha.pseduotime <- fread("../dat/alpha.pseudotime2.txt",skip = 1,col.names = c("barcodes","pt"))
-input.beta.pseduotime <- fread("../dat/beta.pseudotime2.txt",skip = 1,col.names = c("barcodes","pt"))
+input.alpha.pseduotime <- fread("./dat/alpha.pseudotime2.txt",skip = 1,col.names = c("barcodes","pt"))
+input.beta.pseduotime <- fread("./dat/beta.pseudotime2.txt",skip = 1,col.names = c("barcodes","pt"))
 input.pseudotime <- rbindlist(list(input.alpha.pseduotime[,type:="alpha"],
                                    input.beta.pseduotime[,type:="beta"]))
 rm(input.alpha.pseduotime);rm(input.beta.pseduotime)
@@ -263,6 +263,9 @@ saveRDS(list(pd=mat.a[rev(ord.a),],pd.anno=pd.anno.a),
 if(T){
   select.gene <- c("FOS::JUN","STAT3","NKX6-1","TEAD1")
   select.gene <- c("NEUROD2","FOSL1")
+  select.gene <- "FOS::JUN"
+  select.gene <- "NEUROD2"
+  select.gene <- "RFX3"
   p.egs <-ggplot(output.motif.pt%>% 
                    filter(type=="alpha",motif.name%in% select.gene)%>%
                    mutate(motif.name =factor(motif.name,levels = select.gene)),
@@ -273,6 +276,15 @@ if(T){
     scale_x_continuous(breaks = c(0,5))+
   theme_bw()
   
+  ## export smoothed data
+  fn<- paste0("/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_",select.gene,"_alpha_smoothed_motif_100bins.ps.csv")
+  ggsave(filename = sub("csv",'pdf',fn),plot = p.egs,width = 8,height = 4)
+  fwrite(file=fn,
+         x=data.frame(pt=seq(0,max(p.egs$data$pt),length.out = 101),
+                      zval=fun.gamSmooth(p.egs$data,
+                new.tps = seq(0,max(p.egs$data$pt),length.out = 101))))
+  
+  ## save fig to file
   fn <- "./figs/fig2/subfig2B_alpha_egs_lab.pdf"
   ggsave(filename = fn,width = 2,height = 2,
          plot = p.egs+theme(legend.position = "none"),
@@ -308,8 +320,9 @@ if(T){
 # fig2B:beta_egs ----------------------------------------------------------------
 
 if(T){
-  select.gene <- c("FOS::JUN","STAT3","NKX6-1","TEAD1")
-  select.gene <- c("RFX3","FOSL1")
+  select.gene <- c("FOS::JUN")#,"STAT3","NKX6-1","TEAD1")
+  select.gene <- "RFX3"
+  select.gene <- "NEUROD2"
   p.egs <-ggplot(output.motif.pt%>% 
                    filter(type=="beta",motif.name%in% select.gene)%>%
                    mutate(motif.name =factor(motif.name,levels = select.gene)),
@@ -319,6 +332,13 @@ if(T){
     coord_cartesian(expand = F)+
     scale_x_continuous(breaks = c(0,5,10,15,20))+
     theme_bw()
+  
+  fn<- paste0("/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_",select.gene,"_beta_smoothed_motif_100bins.ps.csv")
+  ggsave(filename = sub("csv",'pdf',fn),plot = p.egs,width = 8,height = 4)
+  fwrite(file=fn,
+         x=data.frame(pt=seq(0,max(p.egs$data$pt),length.out = 101),
+                      zval=fun.gamSmooth(p.egs$data,
+                                         new.tps = seq(0,max(p.egs$data$pt),length.out = 101))))
   
   fn <- "./figs/fig2/subfig2B_beta_egs_lab.pdf"
   ggsave(filename = fn,width = 2,height = 2,
