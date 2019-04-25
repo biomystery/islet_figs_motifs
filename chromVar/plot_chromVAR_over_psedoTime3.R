@@ -1,6 +1,6 @@
 ## input: 1. summarizedExperiement(SE) obj for chromVAR 2. Jaspar matrix 
 ## output: 1. motif x cell (z score) 2. plot: ranked           
-source("./libs.R")
+source("../libs.R")
 ##------------------------------------------------------------
 ## inputs
 ## 1. motif x cell (zval) 2. cell, celltype 3.  cell, pseudotime 
@@ -266,6 +266,7 @@ if(T){
   select.gene <- "FOS::JUN"
   select.gene <- "NEUROD2"
   select.gene <- "RFX3"
+  select.gene <- grep('RFX',unique(output.motif.pt$motif.name),value = T)
   p.egs <-ggplot(output.motif.pt%>% 
                    filter(type=="alpha",motif.name%in% select.gene)%>%
                    mutate(motif.name =factor(motif.name,levels = select.gene)),
@@ -277,12 +278,17 @@ if(T){
   theme_bw()
   
   ## export smoothed data
-  fn<- paste0("/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_",select.gene,"_alpha_smoothed_motif_100bins.ps.csv")
-  ggsave(filename = sub("csv",'pdf',fn),plot = p.egs,width = 8,height = 4)
+  fn<- paste0("/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_RFXfamily_alpha_smoothed_motif_100bins.ps.csv")
+  ggsave(filename = sub("csv",'pdf',fn),plot = p.egs,width = 4,height = 8)
+  
   fwrite(file=fn,
-         x=data.frame(pt=seq(0,max(p.egs$data$pt),length.out = 101),
-                      zval=fun.gamSmooth(p.egs$data,
-                new.tps = seq(0,max(p.egs$data$pt),length.out = 101))))
+         x=do.call(rbind,lapply(select.gene, function(x)
+           data.frame(
+             motif=x,
+             pt=seq(0,max(p.egs$data$pt),length.out = 101),
+             zval=fun.gamSmooth(p.egs$data,
+                                new.tps = seq(0,max(p.egs$data$pt),length.out = 101)
+             )))))
   
   ## save fig to file
   fn <- "./figs/fig2/subfig2B_alpha_egs_lab.pdf"
@@ -323,6 +329,8 @@ if(T){
   select.gene <- c("FOS::JUN")#,"STAT3","NKX6-1","TEAD1")
   select.gene <- "RFX3"
   select.gene <- "NEUROD2"
+  select.gene <- grep('RFX',unique(output.motif.pt$motif.name),value = T)
+  
   p.egs <-ggplot(output.motif.pt%>% 
                    filter(type=="beta",motif.name%in% select.gene)%>%
                    mutate(motif.name =factor(motif.name,levels = select.gene)),
@@ -333,12 +341,17 @@ if(T){
     scale_x_continuous(breaks = c(0,5,10,15,20))+
     theme_bw()
   
-  fn<- paste0("/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_",select.gene,"_beta_smoothed_motif_100bins.ps.csv")
-  ggsave(filename = sub("csv",'pdf',fn),plot = p.egs,width = 8,height = 4)
+  fn<- paste0("/Users/frank/Dropbox (UCSD_Epigenomics)/projects/islet/slides/2019-04-15_dat_sfigs/figs_RFXfamily_beta_smoothed_motif_100bins.ps.csv")
+  ggsave(filename = sub("csv",'pdf',fn),plot = p.egs,width = 4,height = 8)
+  
   fwrite(file=fn,
-         x=data.frame(pt=seq(0,max(p.egs$data$pt),length.out = 101),
-                      zval=fun.gamSmooth(p.egs$data,
-                                         new.tps = seq(0,max(p.egs$data$pt),length.out = 101))))
+         x=do.call(rbind,lapply(select.gene, function(x)
+           data.frame(
+             motif=x,
+             pt=seq(0,max(p.egs$data$pt),length.out = 101),
+             zval=fun.gamSmooth(p.egs$data,
+                                new.tps = seq(0,max(p.egs$data$pt),length.out = 101)
+             )))))
   
   fn <- "./figs/fig2/subfig2B_beta_egs_lab.pdf"
   ggsave(filename = fn,width = 2,height = 2,
