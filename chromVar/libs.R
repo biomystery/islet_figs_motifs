@@ -17,6 +17,35 @@ require(parallelDist)
 require(matlab)
 require(cluster)
 require(rlist)
+require(chromVAR)
+require(ggdendro)
+require(extrafont)  # fonts 
+# https://blog.revolutionanalytics.com/2012/09/how-to-use-your-favorite-fonts-in-r-charts.html
+suppressMessages(loadfonts())
+require(ggthemes)
+# #https://rpubs.com/Koundy/71792 theme_Publication
+require(ComplexHeatmap)
+cols.hm.avg.tf <- colorRampPalette(c(rgb(249, 249, 212, maxColorValue = 255), rgb(60, 
+    181, 195, maxColorValue = 255), rgb(30, 35, 86, maxColorValue = 255)), space = "Lab")
+
+
+
+theme_pubr<- function (base_size = 11, base_family = "Arial") 
+{
+    theme_foundation() + theme(line = element_line(colour = "black", 
+        lineend = "round", linetype = "solid"), rect = element_rect(fill = "white", 
+        colour = "black", linetype = "solid"), text = element_text(colour = "black", 
+        face = "plain", family = base_family, size = base_size, 
+        vjust = 0.5, hjust = 0.5, lineheight = 0.5), panel.background = element_blank(), 
+        plot.background = element_blank(), panel.border = element_rect(colour = "black", 
+            fill = NA), panel.grid = element_blank(), strip.background = element_rect(colour = NA), 
+        legend.key = element_rect(colour = NA), title = element_text(size = rel(1)), 
+        plot.title = element_text(size = rel(1.2), face = "bold"), 
+        strip.text = element_text(), axis.ticks.length = unit(1, 
+    "mm"))
+}
+
+
 # colors ------------------------------------------------------------------
 cols.subcluster <- c('red4','red3','red1','steelblue4','steelblue1','green4','green1',
                      'purple4','purple1',brewer.pal(9,'Set1')[5:9])
