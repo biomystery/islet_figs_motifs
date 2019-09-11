@@ -7,7 +7,7 @@ source("./libs.R")
 ## output : 1. motif x (pseudotime,type)
 ##------------------------------------------------------------
 # motif x cell - z
-input.chromVar.res.list <- readRDS(file = "./dat/output.jaspar.dev.res.Rdata")
+input.chromVar.res.list <- readRDS(file = "../dat/output.jaspar.dev.res.Rdata")
 input.chromVar.jaspar.z <- data.table(assays(input.chromVar.res.list$dev)$z,keep.rownames = T)%>%
   separate(rn,into=c("id","motif.name"),sep = "_")%>%
   select(-one_of("id"))
@@ -15,14 +15,14 @@ rm(input.chromVar.res.list)
 input.chromVar.jaspar.z <- melt(input.chromVar.jaspar.z,id="motif.name",variable.name = "barcodes",value.name = "zval")
 
 # cell,celltype
-input.umap.res <- fread('./dat/Islet_123.MNN_corrected.UMAP.txt',header = T)%>% 
+input.umap.res <- fread('../dat/1908/Islet_123.MNN_corrected.cluster_labels.filt.txt',header = T)%>% 
   select(one_of("barcodes","cluster"))%>%
   separate(cluster,into = c("cell_type_overall","subtype"),remove=F)
 input.umap.res[is.na(input.umap.res)]<-0
 
 # pseudotime
-input.alpha.pseduotime <- fread("./dat/alpha.pseudotime.txt",skip = 1,col.names = c("barcodes","pt"))
-input.beta.pseduotime <- fread("./dat/beta.pseudotime.txt",skip = 1,col.names = c("barcodes","pt"))
+input.alpha.pseduotime <- fread("../dat/alpha.pseudotime.txt",skip = 1,col.names = c("barcodes","pt"))
+input.beta.pseduotime <- fread("../dat/beta.pseudotime.txt",skip = 1,col.names = c("barcodes","pt"))
 input.pseudotime <- rbindlist(list(input.alpha.pseduotime[,type:="alpha"],
                                    input.beta.pseduotime[,type:="beta"]))
 rm(input.alpha.pseduotime);rm(input.beta.pseduotime)
@@ -37,6 +37,21 @@ output.motif.pt.anno <-output.motif.pt%>%
   group_by(pt,type)%>%
   summarise(subtype=Modes(as.numeric(subtype))[1])
 
+
+# variablilty for a,b,c,g -------------------------------------------------
+
+if(T){
+  select.celltypes <- c("alpha_1" , "alpha_2",  "beta_1",'beta_2','delta_1','delta_2','gamma')
+  dev <- input.chromVar.res.list$dev[,as.character(colData(input.chromVar.res.list$dev)$cell_type) %in% select.celltypes]
+  
+  ## variability 
+  variability <- computeVariability(dev)
+  png(filename = "../dat/1908/output.jaspar.var.res.abcd.png",width = 4,height = 3,res = 300,units = "in")
+  plotVariability(variability, use_plotly = FALSE)
+  dev.off()
+  variability<- variability%>%arrange(desc(variability))
+  write.csv(variability,file = "../dat/1908/output.jaspar.var.res.abcd.csv")
+}
 
 # variablity for alpha --------------------------------------------
 
