@@ -53,6 +53,15 @@ cols.celltype <- c(alpha_1="darkred",alpha_2="lightpink",beta_1="green",beta_2="
                    delta_1="orange",delta_2="gold",
                    gamma="purple",exocrine="black",endothelial_1="royalblue",endothelial_2="navy",immune="blue",
                    stellate="skyblue",glial="cyan")
+cols.celltype["beta"] = rgb(t((col2rgb(cols.celltype["beta_1"]) + col2rgb(cols.celltype["beta_2"]))/2), 
+    maxColorValue = 255)
+cols.celltype["alpha"] = rgb(t((col2rgb(cols.celltype["alpha_1"]) + col2rgb(cols.celltype["alpha_2"]))/2), 
+    maxColorValue = 255)
+cols.celltype["delta"] = rgb(t((col2rgb(cols.celltype["delta_1"]) + col2rgb(cols.celltype["delta_2"]))/2), 
+    maxColorValue = 255)
+cols.celltype["endothelial"] = rgb(t((col2rgb(cols.celltype["endothelial_1"]) + col2rgb(cols.celltype["endothelial_2"]))/2), 
+    maxColorValue = 255)
+
 
 cols.cluster <- brewer.pal(9,'Set1')
 cols.hm.avg.tf <- colorRampPalette(c(rgb(249,249,212,maxColorValue = 255),
