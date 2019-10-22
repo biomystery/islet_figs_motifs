@@ -49,8 +49,8 @@ theme_pubr<- function (base_size = 11, base_family = "Arial")
 # colors ------------------------------------------------------------------
 cols.subcluster <- c('red4','red3','red1','steelblue4','steelblue1','green4','green1',
                      'purple4','purple1',brewer.pal(9,'Set1')[5:9])
-cols.celltype <- c(alpha_1="darkred",alpha_2="lightpink",beta_1="darkgreen",beta_2="lightgreen",
-                   delta_1="orange",delta_2="gold",
+cols.celltype <- c(acinar='grey',alpha_1="darkred",alpha_2="lightpink",beta_1="darkgreen",beta_2="lightgreen",
+                   delta_1="orange",delta_2="gold",ductal="cyan",
                    gamma="purple",exocrine="black",endothelial_1="royalblue",endothelial_2="navy",immune="blue",
                    stellate="skyblue",glial="cyan")
 cols.celltype["beta"] = rgb(t((col2rgb(cols.celltype["beta_1"]) + col2rgb(cols.celltype["beta_2"]))/2), 
