@@ -220,3 +220,9 @@ plotLegend <- function(cols,bks,fnames){
   dev.off()
 }
 
+#load data ------------------------------------------------------------
+
+input.chromVar.res.list <- readRDS(file = "../dat/1910_v2/output.jaspar.dev.res.Rdata")
+input.chromVar.jaspar.z <- assays(input.chromVar.res.list$dev)$z
+input.umap.res <- fread('../dat/1910_v2/islet.cluster_labels.filt.txt',header = T)
+
