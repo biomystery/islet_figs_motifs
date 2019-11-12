@@ -1,0 +1,3 @@
+[submodule "HiC_scripts"]
+	path = HiC_scripts
+	url = https://github.com/epigen-UCSD/HiC_scripts
