@@ -116,40 +116,40 @@ cols.sky <- c(fun.importRGB(195,86,26),
               fun.importRGB(62,82,150))
 # functions ---------------------------------------------------------------
 
-fun.plot.project.motif <- function(motif,input.chromVar.z=input.chromVar.jaspar.z,
-                                   umap.res=input.umap.res,
-                                   rescale=F,
-                                   cls=rev(cols.Spectrum(8))){
-  require(scales)
-  
-  
-  #motif.idx <- grep(motif,rownames(input.chromVar.z))
-  motif.idx <- grep(motif,rownames(input.chromVar.z))
-  if(length(motif.idx)==0) {message(motif," is not found!") ; return()} 
-  
-  motif.z <- input.chromVar.z[motif.idx[1],]
-  if(rescale){
-    sc <- max(abs(quantile(motif.z,probs=c(.05,.95))))
-    motif.z[motif.z>sc] <- sc; motif.z[motif.z< -sc] <- -sc
-  }
-  
-  motif.z <- motif.z%>%
-    as.data.frame()%>%
-    rownames_to_column('barcodes')
-  colnames(motif.z)[2] <-"zval"
-  
-  tmp <- umap.res%>%
-    right_join(motif.z)
-  
-  p.default.cluster.motif <-  ggplot(tmp,aes(UMAP1,UMAP2)) + 
-    geom_point(aes(colour=zval),size=.5,shape=16) + 
-    ggtitle(rownames(input.chromVar.jaspar.z)[motif.idx])+
-    #scale_colour_gradient2(low=muted("blue"),high=muted("red"))+
-    scale_color_gradientn(colours = cls)+
-    theme_light()
-  p.default.cluster.motif
+fun.plot.project.motif <- function(motif, input.chromVar.z = input.chromVar.jaspar.z, 
+    umap.res = input.umap.res, rescale = F, cls, bks = c(-4, 0, 4), legend.pos = c(0.2, 
+        0.9), ...) {
+    require(scales)
+    
+    motif.idx <- grep(motif, rownames(input.chromVar.z))
+    if (length(motif.idx) == 0) {
+        message(motif, " is not found!")
+        return()
+    }
+    
+    motif.z <- input.chromVar.z[motif.idx[1], ]
+    if (rescale) {
+        sc <- max(abs(quantile(motif.z, probs = c(0.05, 0.95))))
+        motif.z[motif.z > sc] <- sc
+        motif.z[motif.z < -sc] <- -sc
+    }
+    
+    motif.z <- motif.z %>% as.data.frame() %>% rownames_to_column("barcodes")
+    colnames(motif.z)[2] <- "zval"
+    
+    tmp <- umap.res %>% right_join(motif.z)
+    tmp <- tmp %>% mutate(zval = ifelse(zval > bks[3], bks[3], ifelse(zval < bks[1], 
+        bks[1], zval)))
+    p.default.cluster.motif <- ggplot(tmp, aes(UMAP1, UMAP2)) + geom_point(aes(colour = zval), 
+        shape = 16, ...) + ggtitle(rownames(input.chromVar.jaspar.z)[motif.idx]) + 
+        scale_color_gradientn(colours = cls, breaks = bks) + theme_pubr() + theme(text = element_blank(), 
+        axis.ticks = element_blank(), legend.position = legend.pos, legend.direction = "horizontal", 
+        legend.key.width = unit(2, "mm"), legend.key.height = unit(0.1, "inches"), 
+        legend.text = element_text(size = 10, family = "Arial"), legend.background = element_rect(fill = "transparent", 
+            colour = "transparent"), plot.margin = unit(c(1, 1, -1, -1), "mm"))
+    
+    p.default.cluster.motif
 }
-
 
 Modes <- function(x) {
   ux <- unique(x)

@@ -5,3 +5,5 @@ figs/*
 .RData*
 .Rproj.user
 .ipynb_checkpoints
+*\#*
+*\$*
