@@ -224,5 +224,5 @@ plotLegend <- function(cols,bks,fnames){
 
 input.chromVar.res.list <- readRDS(file = "../dat/1910_v2/output.jaspar.dev.res.Rdata")
 input.chromVar.jaspar.z <- assays(input.chromVar.res.list$dev)$z
-input.umap.res <- fread('../dat/1910_v2/islet.cluster_labels.filt.txt',header = T)
+input.umap.res <- fread('../dat/1910_v2/islet.cluster_labels.filt.txt',header = T)%>%separate(cluster_name, into = c("cell_type_overall", "subtype"),remove = F)%>% rename(barcodes = "index", cluster = "cluster_name")
 
